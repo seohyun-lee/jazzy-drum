@@ -6,6 +6,7 @@ import { retimeTimeline } from './timing.js';
 import './style.css';
 
 const app = document.querySelector('#app');
+const drumKitImage = `${import.meta.env.BASE_URL}assets/drum-kit-labelled.png`;
 let audio = new DrumAudio();
 let song = songs[0];
 let BPM, BEAT, COUNT_IN, DURATION;
@@ -46,7 +47,7 @@ app.innerHTML = `
   <main class="shell">
     <header class="topbar">
       <div class="brand"><span class="brand-mark">j.</span><span>jazzy<small>삶을 리듬감있게 살자</small></span></div>
-      <div class="top-right"><span class="top-note">오늘의 작은 리듬</span><button class="icon-button" id="help" aria-label="연주 방법 보기">?</button></div>
+      <div class="top-right"><span class="top-note">오늘의 작은 리듬</span><button class="fullscreen-button" id="fullscreen" type="button" aria-pressed="false">⛶ 전체화면</button><button class="icon-button" id="help" aria-label="연주 방법 보기">?</button></div>
     </header>
 
     <section class="game-card" aria-label="드럼 리듬 게임">
@@ -64,11 +65,11 @@ app.innerHTML = `
       <div class="play-surface">
         <div class="surface-heading"><span class="live-dot"></span><span id="feedback">편하게 한 박자씩 시작해요</span><span id="combo">0번 연속</span></div>
         <div class="kit" id="kit" aria-label="연주할 드럼 세트">
-          <img src="/assets/drum-kit-labelled.png" alt="양쪽 위의 크래시 1·2, 오른쪽 아래의 큰 라이드와 두 페달이 보이는 드럼 세트" draggable="false" />
+          <img src="${drumKitImage}" alt="양쪽 위의 크래시 1·2, 오른쪽 아래의 큰 라이드와 두 페달이 보이는 드럼 세트" draggable="false" />
           <div id="target-layer"></div>
           ${hitZones.map(([id, label]) => `<button class="hit-zone zone-${id}" data-instrument="${id === 'kickPedal' ? 'kick' : id}" aria-label="${label} 연주"></button>`).join('')}
         </div>
-        <div class="kit-footer"><button id="guide" class="pill is-on" aria-pressed="true">◎ 가이드 켜짐</button><span>하이햇 <kbd>F</kbd> · 스네어 <kbd>J</kbd> · 킥 <kbd>Space</kbd></span></div>
+        <div class="kit-footer"><button id="guide" class="pill is-on" aria-pressed="true">◎ 가이드 켜짐</button><span>하이햇 <kbd>S</kbd> · 스네어 <kbd>D</kbd> · 킥 <kbd>Space</kbd> · 라이드 <kbd>K</kbd></span></div>
       </div>
     </section>
 
@@ -366,8 +367,27 @@ document.addEventListener('keydown', (event) => {
     event.preventDefault();
     play(instrument);
   }
-  if (event.key === 'Escape' && state.status === 'playing') pause();
+  if (event.key === 'Escape' && !document.fullscreenElement && state.status === 'playing') pause();
 });
+
+const fullscreenButton = $('#fullscreen');
+function syncFullscreenButton() {
+  const active = Boolean(document.fullscreenElement);
+  fullscreenButton.textContent = active ? '⛶ 화면 복귀' : '⛶ 전체화면';
+  fullscreenButton.setAttribute('aria-pressed', String(active));
+}
+fullscreenButton.disabled = !document.documentElement.requestFullscreen;
+fullscreenButton.title = fullscreenButton.disabled ? '이 브라우저는 전체화면을 지원하지 않습니다' : '전체화면 전환';
+fullscreenButton.addEventListener('click', async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {
+    fullscreenButton.title = '이 브라우저에서는 전체화면을 사용할 수 없습니다';
+  }
+  syncFullscreenButton();
+});
+document.addEventListener('fullscreenchange', syncFullscreenButton);
 
 $('#pause').addEventListener('click', pause);
 $('#library').addEventListener('click', openLibrary);
@@ -389,7 +409,7 @@ $('#guide').addEventListener('click', () => {
 });
 $('#help').addEventListener('click', () => {
   if (state.status === 'playing') pause();
-  openModal(`<p class="modal-kicker">연주 방법</p><h2>악보를 보고, 드럼을 쳐요.</h2><p>노트가 왼쪽의 ‘지금’ 선에 닿을 때 해당 드럼을 터치하세요. 칠 위치는 1초 전에 나타나고, 0.5초 전에 선명해져요.</p><div class="key-list"><span>하이햇 <kbd>F</kbd></span><span>스네어 <kbd>J</kbd></span><span>킥 <kbd>Space</kbd></span></div><button class="primary" id="close-help">${state.status === 'paused' ? '계속 연주' : state.status === 'ready' ? '연주 시작' : '확인'} <span>→</span></button>`);
+  openModal(`<p class="modal-kicker">연주 방법</p><h2>악보를 보고, 드럼을 쳐요.</h2><p>노트가 왼쪽의 ‘지금’ 선에 닿을 때 해당 드럼을 터치하세요. 칠 위치는 1초 전에 나타나고, 0.5초 전에 선명해져요.</p><div class="key-list"><span>하이햇 <kbd>S</kbd></span><span>스네어 <kbd>D</kbd></span><span>킥 <kbd>Space</kbd></span><span>라이드 <kbd>K</kbd></span></div><button class="primary" id="close-help">${state.status === 'paused' ? '계속 연주' : state.status === 'ready' ? '연주 시작' : '확인'} <span>→</span></button>`);
   $('#close-help').addEventListener('click', state.status === 'paused' ? resume : state.status === 'ready' ? start : closeModal);
 });
 

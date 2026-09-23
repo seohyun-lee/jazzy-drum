@@ -54,6 +54,10 @@
 .target-floor{left:74%;top:48%}
 .target-kick{left:50%;top:61%}
 .practice-strip{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 4px 12px;color:#4b6557;font-size:11px}
+.fullscreen-button{border:1px solid #acb8aa;border-radius:18px;background:transparent;color:#355042;padding:6px 11px;font-size:12px;font-weight:700;white-space:nowrap}
+.fullscreen-button:hover:not(:disabled){background:#e8ede3}
+.fullscreen-button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:500px){.top-right{gap:8px}.top-note{display:none}.fullscreen-button{padding:5px 9px;font-size:11px}}
 .practice-strip label,.scroll-choice{display:flex;align-items:center;gap:8px}
 .practice-strip select,.scroll-choice select{font:inherit;color:#355442;background:#f5f3e9;border:1px solid #ccd5c6;border-radius:8px;padding:6px 8px;max-width:100%}
 .practice-panel{background:#edf2e7;border:1px solid #d8e2cf;border-radius:13px;padding:13px 15px;margin:12px 0 15px;color:#345442;font-size:12px}
