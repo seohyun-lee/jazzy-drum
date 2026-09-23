@@ -4,10 +4,10 @@ export const INSTRUMENTS = {
   kick: { label: '킥', key: 'Space', color: '#3c765f' },
   tom1: { label: '하이 탐', key: 'F', color: '#818876' },
   tom2: { label: '로우 탐', key: 'J', color: '#818876' },
-  floor: { label: '플로어 탐', key: 'L', color: '#818876' },
+  floor: { label: '플로어 탐', key: 'K', color: '#818876' },
   crash: { label: '크래시 1', key: 'E', color: '#b68a3d' },
-  crash2: { label: '크래시 2', key: 'U', color: '#c6944b' },
-  ride: { label: '라이드', key: 'K', color: '#b68a3d' },
+  crash2: { label: '크래시 2', key: 'I', color: '#c6944b' },
+  ride: { label: '라이드', key: 'L', color: '#b68a3d' },
   hhPedal: { label: '하이햇 페달', key: 'G', color: '#b68a3d' },
 };
 
