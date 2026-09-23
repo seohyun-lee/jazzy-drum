@@ -9,7 +9,7 @@ test('Korean IME still maps the physical S, D and Space keys', () => {
 });
 
 test('left and right cymbals use the corresponding keyboard sides', () => {
-  assert.equal(instrumentForKey({ code: 'KeyA' }), 'crash');
+  assert.equal(instrumentForKey({ code: 'KeyE' }), 'crash');
   assert.equal(instrumentForKey({ code: 'KeyU' }), 'crash2');
   assert.equal(instrumentForKey({ code: 'KeyK' }), 'ride');
 });
