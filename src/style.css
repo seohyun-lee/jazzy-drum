@@ -142,3 +142,28 @@
   :fullscreen .notation{height:70px;border-radius:0}
   :fullscreen .kit{width:100%;height:100%}
 }
+
+/* The playhead is a small downward cue; notes sit on balanced lanes. */
+.notation{height:88px}
+.note-hh,.note-crash,.note-crash2,.note-ride{top:17px}
+.note-snare,.note-tom1,.note-tom2,.note-floor,.note-hhPedal{top:44px}
+.note-kick{top:70px}
+.staff-lines{inset:18px 0}
+.playhead{top:4px;bottom:4px}
+.playhead span{display:none}
+.playhead::before{content:'';position:absolute;left:50%;top:-1px;transform:translateX(-50%);border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid #244c3c}
+@media(max-width:720px){.notation{height:88px}}
+:fullscreen .notation{height:84px}
+:fullscreen .note-hh,:fullscreen .note-crash,:fullscreen .note-crash2,:fullscreen .note-ride{top:20px}
+:fullscreen .note-snare,:fullscreen .note-tom1,:fullscreen .note-tom2,:fullscreen .note-floor,:fullscreen .note-hhPedal{top:42px}
+:fullscreen .note-kick{top:65px}
+:fullscreen .staff-lines{inset:17px 0}
+:fullscreen .playhead{top:4px;bottom:4px}
+@media(max-height:430px) and (orientation:landscape){
+  :fullscreen .notation{height:70px}
+  :fullscreen .note-hh,:fullscreen .note-crash,:fullscreen .note-crash2,:fullscreen .note-ride{top:14px}
+  :fullscreen .note-snare,:fullscreen .note-tom1,:fullscreen .note-tom2,:fullscreen .note-floor,:fullscreen .note-hhPedal{top:35px}
+  :fullscreen .note-kick{top:56px}
+  :fullscreen .staff-lines{inset:13px 0}
+  :fullscreen .playhead{top:3px;bottom:3px}
+}
