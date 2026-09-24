@@ -24,8 +24,10 @@
 .song-description{min-width:0;display:flex;flex-direction:column;gap:4px;line-height:1.25}
 .song-description strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .song-description>span,.song-description small{font-size:10px;color:#738074}
-.song-description em{display:none;margin-top:2px;color:#496557;font-size:10px;font-style:normal;line-height:1.35}
+.song-description em{display:none;align-self:flex-start;margin-top:2px;padding:3px 6px;border-radius:6px;background:#e2ebdf;color:#365747;font-size:9px;font-weight:600;font-style:normal;line-height:1.35}
 .song-option.selected .song-description em{display:block}
+.mode-option{border-style:dashed}
+.mode-option.selected{border-style:solid}
 @media(max-width:640px){.song-option{gap:7px;padding:6px}.song-option.selected{padding:5px}.song-art{width:46px;height:46px;font-size:26px}.song-description strong{font-size:11px}.song-description>span,.song-description small{font-size:9px}.song-grid{gap:7px}.song-actions{gap:5px}.library-button{padding:5px 6px;font-size:10px}}
 /* Ride moved clear of the rack toms and the floor tom. */
 .zone-crash2{left:75%;top:1%;width:23%;height:16%}
@@ -86,22 +88,57 @@
 
 :fullscreen{background:#19342c;overflow:hidden}
 :fullscreen .shell{display:flex;flex-direction:column;width:100%;height:100dvh;max-width:none;padding:0}
-:fullscreen .topbar{flex:0 0 auto;padding:3px 10px;background:#fffaf0}
-:fullscreen .brand{font-size:19px;gap:6px}
-:fullscreen .brand-mark{width:25px;height:25px;border-radius:7px;font-size:18px}
-:fullscreen .brand small,:fullscreen .top-note{display:none}
+:fullscreen .topbar{position:fixed;top:5px;right:7px;z-index:20;padding:0;background:transparent}
+:fullscreen .brand,:fullscreen .top-note,:fullscreen .icon-button{display:none}
+:fullscreen .fullscreen-button{background:#fffaf0e8;box-shadow:0 2px 8px #18322920}
 :fullscreen .game-card{display:flex;flex-direction:column;flex:1;min-height:0;border:0;border-radius:0;box-shadow:none}
-:fullscreen .songbar{flex:0 0 auto;min-height:37px;padding:2px 10px}
-:fullscreen .songbar h1{font-size:15px;max-width:40vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-:fullscreen .eyebrow,:fullscreen .songmeta{display:none}
-:fullscreen .notation-wrap{flex:0 0 auto;padding:2px 8px 4px}
+:fullscreen .songbar{position:fixed;top:5px;right:112px;z-index:19;min-height:0;padding:0;background:transparent}
+:fullscreen .songbar>div:first-child,:fullscreen .eyebrow,:fullscreen .songmeta{display:none}
+:fullscreen #library{display:none}
+:fullscreen .song-actions{gap:10px}
+:fullscreen .round-button{width:31px;height:31px}
+:fullscreen .notation-wrap{flex:0 0 auto;padding:0 8px 4px}
 :fullscreen .practice-strip{display:none}
-:fullscreen .notation-title{padding:0 4px 2px;font-size:10px}
-:fullscreen .notation{height:clamp(60px,20dvh,88px);border-radius:10px}
+:fullscreen .notation-title{display:none}
+:fullscreen .notation{height:110px;border-radius:0 0 10px 10px}
 :fullscreen .play-surface{display:flex;flex-direction:column;flex:1;min-height:0;padding:3px 8px 4px;overflow:hidden}
-:fullscreen .surface-heading{flex:0 0 auto;min-height:17px;padding:0 6px 2px;font-size:11px}
-:fullscreen .kit{flex:1 1 auto;min-height:0;height:100%;width:auto;max-width:100%;aspect-ratio:3/2}
+:fullscreen .surface-heading{flex:0 0 22px;min-height:22px;padding:0 6px 2px;font-size:11px}
+:fullscreen .kit{flex:0 1 auto;align-self:center;width:min(100%,calc((100dvh - 140px) * 1.5));max-width:none;aspect-ratio:3/2;margin:auto}
 :fullscreen .kit img{width:100%;height:100%;object-fit:contain}
 :fullscreen .kit-footer,:fullscreen .below{display:none}
 :fullscreen .modal{max-height:calc(100dvh - 16px)}
-@media(max-height:430px) and (orientation:landscape){:fullscreen .topbar{padding:1px 8px}:fullscreen .songbar{min-height:31px}:fullscreen .notation{height:60px}:fullscreen .notation-title{font-size:9px}:fullscreen .surface-heading{min-height:14px;font-size:10px}:fullscreen .icon-button{width:25px;height:25px}:fullscreen .fullscreen-button{padding:3px 8px}}
+@media(max-height:430px) and (orientation:landscape){:fullscreen .topbar{top:3px;right:4px}:fullscreen .songbar{top:3px;right:91px}:fullscreen .song-actions{font-size:10px}:fullscreen .round-button{width:26px;height:26px}:fullscreen .notation{height:72px}:fullscreen .note{width:21px;height:21px;font-size:8px}:fullscreen .note-kick{width:34px;font-size:7px}:fullscreen .note-hh,:fullscreen .note-crash,:fullscreen .note-crash2,:fullscreen .note-ride{top:22px}:fullscreen .note-snare{top:39px}:fullscreen .note-kick{top:57px}:fullscreen .staff-lines{inset:20px 0}:fullscreen .playhead{top:7px}:fullscreen .surface-heading{flex-basis:15px;min-height:15px;font-size:9px}:fullscreen .fullscreen-button{padding:3px 7px;font-size:10px}:fullscreen .kit{width:min(100%,calc((100dvh - 95px) * 1.5))}}
+
+/* Compact, legible staff notes and landscape play dialogs. */
+.notation-title{display:none}
+.note{width:25px;height:25px;border-width:1.5px;font-size:11px;box-shadow:0 2px 6px #26382935}
+.note-kick{width:30px;font-size:10px;letter-spacing:0}
+@media(max-width:720px){.note{width:23px;height:23px;font-size:11px}.note-kick{width:28px;font-size:10px}}
+@media(orientation:landscape) and (max-height:600px){
+  .overlay{padding:8px}
+  .modal.play-modal,.modal.result-modal{position:relative;width:min(92vw,720px);max-height:calc(100dvh - 16px);padding:14px 18px;border-radius:18px}
+  .modal.play-modal h2,.modal.result-modal h2{font-size:22px;line-height:1.15;margin:4px 0 7px}
+  .modal.play-modal>p,.modal.result-modal>p{font-size:11px;line-height:1.4;margin:0 0 8px}
+  .modal.play-modal .practice-panel{margin:7px 0 9px;padding:8px 10px}
+  .modal.play-modal #bpm-range{margin:4px 0 1px;min-height:18px}
+  .modal.play-modal .scroll-choice{margin-top:5px}
+  .modal.play-modal .primary,.modal.result-modal .primary{padding:9px 14px;font-size:12px}
+  .modal.play-modal .text-button,.modal.result-modal .text-button{margin:7px auto 0;font-size:11px}
+  .modal.result-modal .score{position:absolute;top:18px;right:22px;margin:0}
+  .modal.result-modal .score strong{font-size:43px}
+  .modal.result-modal .score small{font-size:20px}
+  .modal.result-modal .result-stats{margin:9px 0 10px;padding:8px 0}
+  .modal.result-modal .result-stats b{font-size:15px}
+}
+@media(max-height:430px) and (orientation:landscape){:fullscreen .note{width:21px;height:21px;font-size:10px}:fullscreen .note-kick{width:26px;font-size:9px}}
+
+/* Fullscreen uses the whole landscape stage; keep every pedal in frame. */
+:fullscreen .play-surface{padding:0;overflow:hidden}
+:fullscreen .surface-heading{display:none}
+:fullscreen .kit{width:100%;height:100%;flex:1 1 auto;max-width:none;aspect-ratio:auto;margin:0}
+:fullscreen .kit img{width:100%;height:100%;object-fit:fill;border-radius:0}
+@media(max-height:430px) and (orientation:landscape){
+  :fullscreen .notation-wrap{padding:0}
+  :fullscreen .notation{height:70px;border-radius:0}
+  :fullscreen .kit{width:100%;height:100%}
+}
