@@ -75,14 +75,14 @@ export class DrumAudio {
     return buffer;
   }
 
-  cymbal(instrument, time) {
+  cymbal(instrument, time, velocity = 1) {
     const count = this.cymbalCounts.get(instrument) ?? 0;
     this.cymbalCounts.set(instrument, count + 1);
     const source = this.context.createBufferSource();
     const volume = this.context.createGain();
     const pan = this.context.createStereoPanner();
     source.buffer = this.cymbalBuffers.get(instrument)[count % 3];
-    volume.gain.value = instrument === 'ride' ? 0.52 : 0.77;
+    volume.gain.value = (instrument === 'ride' ? 0.52 : 0.77) * velocity;
     pan.pan.value = instrument === 'crash' ? -0.38 : instrument === 'crash2' ? 0.46 : 0.25;
     source.connect(volume).connect(pan).connect(this.context.destination);
     this.track(source, [volume, pan]);
@@ -120,22 +120,22 @@ export class DrumAudio {
     source.stop(time + length + 0.01);
   }
 
-  play(instrument, at = this.context?.currentTime) {
+  play(instrument, at = this.context?.currentTime, velocity = 1) {
     if (!this.context || at == null) return;
     const time = Math.max(at, this.context.currentTime);
     if (instrument === 'kick') {
-      this.oscillator(145, 42, time, 0.22, 0.7);
-      this.noise(time, 0.03, 0.09, 900);
+      this.oscillator(145, 42, time, 0.22, 0.7 * velocity);
+      this.noise(time, 0.03, 0.09 * velocity, 900);
     } else if (instrument === 'snare') {
-      this.noise(time, 0.18, 0.32, 1300);
-      this.oscillator(190, 120, time, 0.11, 0.22, 'triangle');
+      this.noise(time, 0.18, 0.32 * velocity, 1300);
+      this.oscillator(190, 120, time, 0.11, 0.22 * velocity, 'triangle');
     } else if (instrument === 'hh' || instrument === 'hhPedal') {
-      this.noise(time, instrument === 'hhPedal' ? 0.08 : 0.13, 0.16, 6500);
+      this.noise(time, instrument === 'hhPedal' ? 0.08 : 0.13, 0.16 * velocity, 6500);
     } else if (this.cymbalBuffers.has(instrument)) {
-      this.cymbal(instrument, time);
+      this.cymbal(instrument, time, velocity);
     } else {
       const start = instrument === 'tom1' ? 180 : instrument === 'tom2' ? 140 : 110;
-      this.oscillator(start, start * 0.48, time, 0.28, 0.35);
+      this.oscillator(start, start * 0.48, time, 0.28, 0.35 * velocity);
     }
   }
 

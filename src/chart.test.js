@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { INSTRUMENTS, freshChart, songs } from './chart.js';
 
-test('four songs have distinct playable timelines and use the visible kit', () => {
-  assert.equal(songs.length, 4);
-  assert.equal(new Set(songs.map(song => song.id)).size, 4);
+test('five songs have distinct playable timelines and use the visible kit', () => {
+  assert.equal(songs.length, 5);
+  assert.equal(new Set(songs.map(song => song.id)).size, 5);
   assert.equal(new Set(songs.map(song => song.meter)).size, 2);
   const signatures = [];
   for (const song of songs) {
@@ -16,5 +16,17 @@ test('four songs have distinct playable timelines and use the visible kit', () =
     assert.ok(notes.some(note => note.instrument === 'ride' || note.instrument === 'crash2'));
     signatures.push(notes.map(note => `${note.beat}:${note.instrument}`).join('|'));
   }
-  assert.equal(new Set(signatures).size, 4);
+  assert.equal(new Set(signatures).size, 5);
+});
+
+test('Blue Note has varied bars and alternating cymbal textures', () => {
+  const song = songs.find(item => item.id === 'blue-note-walk');
+  const notes = freshChart(song);
+  const barSignatures = Array.from({ length: song.bars }, (_, bar) =>
+    notes.filter(note => Math.floor(note.beat / song.meter) === bar)
+      .map(note => `${(note.beat % song.meter).toFixed(3)}:${note.instrument}`).join('|'));
+  assert.ok(new Set(barSignatures).size >= 16);
+  assert.ok(notes.some(note => note.instrument === 'hh'));
+  assert.ok(notes.some(note => note.instrument === 'ride'));
+  assert.ok(notes.filter(note => note.instrument === 'ride').length < notes.filter(note => note.instrument === 'hh').length);
 });

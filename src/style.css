@@ -184,3 +184,118 @@
   :fullscreen .note-kick{top:58px}
   :fullscreen .staff-lines{inset:16px 0}
 }
+/* The closing ring touches the target's outer white outline at the hit. */
+.target .approach{inset:-5px}
+.preview-toggle{display:block;margin:-10px 0 8px auto;padding:5px 9px;border:1px solid #b8c7b6;border-radius:999px;background:#edf3e9;color:#315840;font-size:10px;font-weight:700}
+.preview-toggle[hidden]{display:none}
+/* Song library: one visual language for tracks and play modes. */
+.modal.song-library{display:flex;flex-direction:column;width:min(920px,calc(100vw - 24px));height:min(820px,calc(100dvh - 24px));max-height:calc(100dvh - 24px);padding:0;overflow:hidden;border-radius:24px}
+.library-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex:none;padding:25px 30px 16px;border-bottom:1px solid #e6e5d9}
+.modal .library-header h2{margin:2px 0 7px;font-size:clamp(25px,3vw,34px)}
+.modal .library-header p{margin:0;font-size:12px;line-height:1.5}
+.modal .library-header .modal-kicker{font-size:10px!important}
+.library-header .preview-toggle{flex:none;margin:0;padding:8px 13px;font-size:11px}
+.library-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:20px 30px 24px;scrollbar-color:#b8c8b7 transparent}
+.library-section+.library-section{margin-top:23px}
+.library-section-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:11px}
+.library-section-title strong{font-size:13px;color:#234637}
+.library-section-title span{font-size:10px;color:#7b897b}
+.modal.song-library .song-grid,.mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0}
+.mode-grid:has(> :only-child){grid-template-columns:1fr}
+.modal.song-library .song-option{position:relative;display:grid;grid-template-columns:60px minmax(0,1fr) 18px;align-items:center;gap:13px;width:100%;min-height:88px;padding:11px;border:1px solid #d9dfd1;border-radius:16px;background:#fffdf7;color:#213a2d;text-align:left;box-shadow:0 1px 2px #243b2810;transition:border-color .16s,background .16s,transform .16s,box-shadow .16s}
+.modal.song-library .song-option:hover{border-color:#94ab95;background:#f8fbf3;transform:translateY(-1px)}
+.modal.song-library .song-option.selected,.modal.song-library .song-option.is-open{border:2px solid #386b51;padding:10px;background:#f0f6ec;box-shadow:0 5px 16px #395b3820}
+.modal.song-library .song-art{width:60px;height:60px;border-radius:12px;font-size:31px}
+.modal.song-library .song-description{gap:4px}
+.modal.song-library .song-description strong{font-size:15px;letter-spacing:-.4px}
+.modal.song-library .song-description>span{font-size:11px;color:#68796b}
+.modal.song-library .song-number{font-size:9px!important;font-weight:800;letter-spacing:1.1px;color:#8a795f!important}
+.modal.song-library .song-description em{margin:1px 0 0;padding:0;background:transparent;color:#3c6850;font-size:10px;font-weight:600}
+.card-arrow{align-self:center;color:#829483;font-size:18px;line-height:1;text-align:center}
+.modal.song-library .song-option.selected .card-arrow,.modal.song-library .song-option.is-open .card-arrow{color:#2e6847}
+.modal.song-library .mode-option{border-style:solid}
+.modal.song-library .import-toggle{font:inherit;cursor:pointer}
+.modal.song-library .import-toggle .import-art{background:#537c6d}
+.modal.song-library .import-toggle.is-open .card-arrow{transform:rotate(180deg)}
+.mode-grid>.import-body{grid-column:1/-1;margin:-1px 0 1px;padding:15px 18px;border:1px solid #d4e1d2;border-radius:14px;background:#f3f7ef}
+.mode-grid>.import-body[hidden]{display:none}
+.modal.song-library .import-body p{margin:0 0 10px;font-size:11px;line-height:1.5}
+.modal.song-library .import-body #import-status{margin:9px 0 0}
+.imported-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.imported-track{display:flex;align-items:center;gap:6px;max-width:100%;padding:7px 10px;border:1px solid #c9d7c7;border-radius:9px;background:#fffdf7;color:#335844;font-size:11px}
+.imported-track strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.imported-track small{white-space:nowrap;color:#7a8b7a}
+.imported-track.selected{border-color:#386b51;background:#e4efe1}
+.library-practice{margin:22px 0 0;padding:0;border-radius:14px;overflow:hidden}
+.library-practice summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 15px;cursor:pointer;list-style:none;font-size:12px;font-weight:700}
+.library-practice summary::-webkit-details-marker{display:none}
+.library-practice summary::after{content:'⌄';order:3;color:#58775d;font-size:17px}
+.library-practice[open] summary::after{transform:rotate(180deg)}
+.library-practice summary strong{margin-left:auto;font-size:11px;color:#4b6b54}
+.library-practice .practice-content{padding:12px 15px 14px;border-top:1px solid #d8e2cf}
+.library-footer{flex:none;padding:14px 30px 17px;border-top:1px solid #e1e5d9;background:#fffaf0}
+.library-footer .primary{padding:12px 17px;font-size:14px}
+.modal.song-library .library-footer .modal-footnote{margin:7px 0 0;font-size:10px}
+@media(max-width:600px){
+  .modal.song-library{width:calc(100vw - 16px);height:calc(100dvh - 16px);max-height:calc(100dvh - 16px);border-radius:17px}
+  .library-header{align-items:flex-start;padding:16px 17px 12px;gap:8px}
+  .modal .library-header h2{font-size:23px;margin:2px 0 5px}
+  .modal .library-header p{font-size:10px}
+  .library-header .preview-toggle{padding:6px 8px;font-size:10px;white-space:nowrap}
+  .library-body{padding:14px 15px 18px}
+  .library-section+.library-section{margin-top:17px}
+  .modal.song-library .song-grid,.mode-grid{grid-template-columns:1fr;gap:7px}
+  .modal.song-library .song-option{grid-template-columns:47px minmax(0,1fr) 17px;gap:10px;min-height:64px;padding:8px;border-radius:12px}
+  .modal.song-library .song-option.selected,.modal.song-library .song-option.is-open{padding:7px}
+  .modal.song-library .song-art{width:47px;height:47px;font-size:25px;border-radius:9px}
+  .modal.song-library .song-description strong{font-size:12px}
+  .modal.song-library .song-description>span{font-size:10px}
+  .modal.song-library .song-number{font-size:8px!important}
+  .modal.song-library .song-description em{font-size:9px}
+  .library-footer{padding:10px 15px 12px}
+  .library-footer .primary{padding:10px 14px;font-size:13px}
+  .modal.song-library .library-footer .modal-footnote{font-size:9px}
+}
+@media(orientation:landscape) and (max-height:600px){
+  .modal.song-library{width:min(960px,calc(100vw - 16px));height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);border-radius:15px}
+  .library-header{align-items:center;padding:10px 18px 7px}
+  .modal .library-header h2{font-size:19px;margin:0 0 2px}
+  .modal .library-header p{font-size:9px}
+  .library-header .preview-toggle{padding:5px 8px;font-size:9px}
+  .library-body{padding:10px 18px 12px}
+  .library-section+.library-section{margin-top:13px}
+  .library-section-title{margin-bottom:6px}
+  .modal.song-library .song-grid,.mode-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .modal.song-library .song-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .modal.song-library .song-option{min-height:61px;grid-template-columns:43px minmax(0,1fr) 14px;gap:8px;padding:6px}
+  .modal.song-library .song-option.selected,.modal.song-library .song-option.is-open{padding:5px}
+  .modal.song-library .song-art{width:43px;height:43px;font-size:24px}
+  .modal.song-library .song-description strong{font-size:11px}
+  .modal.song-library .song-description>span{font-size:9px}
+  .modal.song-library .song-number{font-size:8px!important}
+  .library-practice{margin-top:12px}
+  .library-footer{padding:7px 18px 9px}
+  .library-footer .primary{padding:8px 12px;font-size:11px}
+  .modal.song-library .library-footer .modal-footnote{margin:3px 0 0;font-size:8px}
+}
+@media(orientation:landscape) and (max-height:600px){
+  .library-header{padding:7px 15px 5px}
+  .modal .library-header h2{font-size:17px;margin:0 0 1px}
+  .modal .library-header p{font-size:8px;line-height:1.25}
+  .library-body{padding:6px 15px 9px}
+  .library-section+.library-section{margin-top:9px}
+  .library-section-title{margin-bottom:4px}
+  .library-section-title strong{font-size:11px}
+  .library-section-title span{font-size:8px}
+  .modal.song-library .song-option{min-height:52px;grid-template-columns:37px minmax(0,1fr) 13px;gap:7px;padding:5px}
+  .modal.song-library .song-option.selected,.modal.song-library .song-option.is-open{padding:4px}
+  .modal.song-library .song-art{width:37px;height:37px;font-size:21px}
+  .modal.song-library .song-description{gap:2px}
+  .modal.song-library .song-description strong{font-size:10px}
+  .modal.song-library .song-description>span{font-size:8px}
+  .modal.song-library .song-description em{display:none}
+  .library-practice{margin-top:8px}
+  .library-footer{padding:5px 15px 6px}
+  .library-footer .primary{padding:6px 10px;font-size:10px}
+  .modal.song-library .library-footer .modal-footnote{margin:2px 0 0;font-size:7px}
+}

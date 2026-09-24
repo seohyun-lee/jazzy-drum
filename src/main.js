@@ -10,8 +10,11 @@ import './style.css';
 const app = document.querySelector('#app');
 const drumKitImage = `${import.meta.env.BASE_URL}assets/drum-kit-labelled.png`;
 let audio = new DrumAudio();
+const previewAudio = new DrumAudio();
+const preview = { token: 0, timer: null, track: null, gain: null, song: null, notes: [], startAt: 0, nextNote: 0, nextBeat: 0 };
 let song = songs[0];
 const importedSongs = [];
+const ENABLE_AUDIO_IMPORT = false; // Automatic charting is hidden until drum transcription is reliable.
 const jamSong = {
   id: 'live-jam', title: '즉흥 리듬', style: 'LIVE JAM', difficulty: '자유 연주',
   bpm: 100, bars: 250, meter: 4, duration: 600,
@@ -81,7 +84,7 @@ app.innerHTML = `
           <div id="target-layer"></div>
           ${hitZones.map(([id, label]) => `<button class="hit-zone zone-${id}" data-instrument="${id === 'kickPedal' ? 'kick' : id}" aria-label="${label} 연주"></button>`).join('')}
         </div>
-        <div class="kit-footer"><button id="guide" class="pill is-on" aria-pressed="true">◎ 가이드 켜짐</button><span>하이햇 <kbd>S</kbd> · 스네어 <kbd>D</kbd> · 킥 <kbd>Space</kbd> · 라이드 <kbd>L</kbd></span></div>
+        <div class="kit-footer"><button id="guide" class="pill is-on" aria-pressed="true">◎ 가이드 켜짐</button><span>하이햇 <kbd>D</kbd> · 스네어 <kbd>V</kbd> · 킥 <kbd>Space</kbd> · 라이드 <kbd>K</kbd></span></div>
       </div>
     </section>
 
@@ -110,14 +113,110 @@ function closeModal() {
   elements.overlay.classList.remove('visible');
 }
 
-function practiceMarkup() {
-  return `<section class="practice-panel" aria-label="연습 속도 설정"><div class="tempo-heading"><label for="bpm-number">연습 BPM</label><span><input id="bpm-number" aria-label="연습 BPM 숫자 입력" type="number" min="40" max="180" step="1" value="${BPM}"> BPM</span></div><input id="bpm-range" aria-label="연습 BPM 슬라이더" type="range" min="40" max="180" step="1" value="${BPM}"><div class="tempo-presets"><span id="original-tempo">원곡 ${song.bpm} BPM</span><button data-tempo="0.5">절반 속도</button><button data-tempo="0.75">75% 속도</button><button data-tempo="1">원곡 속도</button></div><label class="scroll-choice">악보 속도 <select id="modal-scroll-speed"><option value="8">아주 느리게 · 8초 미리보기</option><option value="6">느리게 · 6초 미리보기</option><option value="4">보통 · 4초 미리보기</option><option value="2">빠르게 · 2초 미리보기</option></select></label></section>`;
+function stopPreview() {
+  preview.token++;
+  if (preview.timer) window.clearInterval(preview.timer);
+  preview.timer = null;
+  previewAudio.stopAll();
+  if (preview.track) {
+    try { preview.track.stop(); } catch { /* Already ended. */ }
+    preview.track.disconnect();
+    preview.gain?.disconnect();
+  }
+  preview.track = null;
+  preview.gain = null;
+  preview.song = null;
+  const button = $('#preview-toggle');
+  if (button) button.textContent = '▶ 미리 듣기';
+}
+
+function scheduleSongBackingBeat(engine, selected, beat, at, beatLength) {
+  const bar = Math.floor(beat / selected.meter);
+  const step = beat % selected.meter;
+  const chord = selected.chords[bar % selected.chords.length];
+  if (selected.id === 'blue-note-walk') {
+    const nextRoot = selected.chords[(bar + 1) % selected.chords.length][0];
+    const walkingBass = [chord[0] - 12, chord[0] - 8, chord[0] - 5, nextRoot - 13];
+    engine.bass(at, 440 * 2 ** ((walkingBass[step] - 69) / 12));
+    if (step === 1 || step === 3) engine.chord(at + beatLength * 2 / 3, chord, beatLength * 1.15);
+    return;
+  }
+  const bassNote = step === 0 ? chord[0] - 12 : chord[step % chord.length] - 12;
+  engine.bass(at, 440 * 2 ** ((bassNote - 69) / 12));
+  if (step === 0 || (selected.meter === 4 && step === 2)) engine.chord(at, chord, beatLength * 1.5);
+}
+
+function schedulePreview() {
+  const selected = preview.song;
+  if (!selected || selected.source === 'file') return;
+  const context = previewAudio.context;
+  const beatLength = 60 / selected.bpm;
+  const beats = selected.bars * selected.meter;
+  const duration = beats * beatLength;
+  const horizon = context.currentTime + 0.16;
+  while (preview.startAt <= horizon) {
+    while (preview.nextNote < preview.notes.length && preview.startAt + preview.notes[preview.nextNote].time <= horizon) {
+      const note = preview.notes[preview.nextNote++];
+      const at = preview.startAt + note.time;
+      if (at >= context.currentTime - 0.03) previewAudio.play(note.instrument, at, note.velocity);
+    }
+    while (preview.nextBeat < beats && preview.startAt + preview.nextBeat * beatLength <= horizon) {
+      const beat = preview.nextBeat++;
+      const at = preview.startAt + beat * beatLength;
+      if (at >= context.currentTime - 0.03) scheduleSongBackingBeat(previewAudio, selected, beat, at, beatLength);
+    }
+    if (preview.nextNote < preview.notes.length || preview.nextBeat < beats || preview.startAt + duration > horizon) break;
+    preview.startAt += duration;
+    preview.nextNote = 0;
+    preview.nextBeat = 0;
+  }
+}
+
+async function startPreview() {
+  stopPreview();
+  if (song.source === 'jam') return;
+  const token = preview.token;
+  const selected = song;
+  try {
+    await previewAudio.unlock();
+    if (preview.token !== token || song !== selected || state.status !== 'ready') return;
+    preview.song = selected;
+    preview.startAt = previewAudio.context.currentTime + 0.04;
+    preview.nextNote = 0;
+    preview.nextBeat = 0;
+    if (selected.source === 'file') {
+      const source = previewAudio.context.createBufferSource();
+      const gain = previewAudio.context.createGain();
+      source.buffer = selected.audioBuffer;
+      source.loop = true;
+      gain.gain.value = 0.6;
+      source.connect(gain).connect(previewAudio.context.destination);
+      source.start(preview.startAt);
+      preview.track = source;
+      preview.gain = gain;
+    } else {
+      preview.notes = freshChart(selected);
+      preview.timer = window.setInterval(schedulePreview, 40);
+      schedulePreview();
+    }
+    const button = $('#preview-toggle');
+    if (button) button.textContent = 'Ⅱ 미리 듣기';
+  } catch {
+    stopPreview();
+  }
+}
+
+function practiceMarkup(collapsible = false) {
+  const controls = `<div class="tempo-heading"><label for="bpm-number">연습 BPM</label><span><input id="bpm-number" aria-label="연습 BPM 숫자 입력" type="number" min="40" max="180" step="1" value="${BPM}"> BPM</span></div><input id="bpm-range" aria-label="연습 BPM 슬라이더" type="range" min="40" max="180" step="1" value="${BPM}"><div class="tempo-presets"><span id="original-tempo">원곡 ${song.bpm} BPM</span><button data-tempo="0.5">절반 속도</button><button data-tempo="0.75">75% 속도</button><button data-tempo="1">원곡 속도</button></div><label class="scroll-choice">악보 속도 <select id="modal-scroll-speed"><option value="8">아주 느리게 · 8초 미리보기</option><option value="6">느리게 · 6초 미리보기</option><option value="4">보통 · 4초 미리보기</option><option value="2">빠르게 · 2초 미리보기</option></select></label>`;
+  if (collapsible) return `<details class="practice-panel library-practice" aria-label="연습 속도 설정"><summary><span>연습 설정</span><strong id="practice-summary">${BPM} BPM · 악보 ${state.lookahead}초</strong></summary><div class="practice-content">${controls}</div></details>`;
+  return `<section class="practice-panel" aria-label="연습 속도 설정">${controls}</section>`;
 }
 
 function syncPracticeControls() {
   if ($('#bpm-number')) $('#bpm-number').value = BPM;
   if ($('#bpm-range')) $('#bpm-range').value = BPM;
   if ($('#original-tempo')) $('#original-tempo').textContent = `원곡 ${song.bpm} BPM`;
+  if ($('#practice-summary')) $('#practice-summary').textContent = `${BPM} BPM · 악보 ${state.lookahead}초`;
   if ($('#modal-scroll-speed')) $('#modal-scroll-speed').value = String(state.lookahead);
   $('#scroll-speed').value = String(state.lookahead);
   $('#tempo-settings').textContent = `연습 BPM · ${BPM}`;
@@ -157,43 +256,55 @@ function bindPracticeControls() {
 }
 
 function showReady() {
+  stopPreview();
   const library = [...songs, ...importedSongs, jamSong];
   const importOpen = song.source === 'file';
-  const songCards = library.filter(item => item.source !== 'jam').map(item => `<button class="song-option ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}" style="--cover-color:${item.color}"><span class="song-art" aria-hidden="true">${item.icon}</span><span class="song-description"><strong>${item.title}</strong><span>${item.style} · ${item.bpm} BPM · ${item.meter}/4</span><small>${item.difficulty} · ${Math.round(item.duration || item.bars * item.meter * 60 / item.bpm)}초</small><em>${item.mood}</em></span></button>`).join('');
-  const jamCard = `<button class="song-option mode-option ${song.source === 'jam' ? 'selected' : ''}" data-song="${jamSong.id}" aria-pressed="${song.source === 'jam'}" style="--cover-color:${jamSong.color}"><span class="song-art" aria-hidden="true">${jamSong.icon}</span><span class="song-description"><strong>즉흥 리듬</strong><span>4번 쳐서 합주 시작</span><small>내 연주를 따라오는 반주</small><em>${jamSong.mood}</em></span></button>`;
-  openModal(`<p class="modal-kicker">JAZZY · 오늘의 플레이리스트</p><h2>오늘은 어떤 리듬으로?</h2><p>노트가 왼쪽 삼각형 아래 선에 닿을 때, 글자와 같은 키나 드럼을 연주하세요. SP는 스페이스바예요.</p><div class="song-grid">${songCards}<section class="import-option ${importOpen ? 'is-open' : ''}"><button class="import-toggle" id="import-toggle" type="button" aria-expanded="${importOpen}" aria-controls="import-body"><span class="song-art import-art" aria-hidden="true">＋</span><span class="song-description"><strong>내 음악으로 연주하기</strong><span>MP3 · WAV · M4A</span><small>자동 BPM·드럼 채보 만들기</small></span><span class="import-chevron" aria-hidden="true">⌄</span></button><div class="import-body" id="import-body" ${importOpen ? '' : 'hidden'}><p>오디오를 선택하면 기기 안에서 BPM과 드럼 타격을 추정해요. 원곡을 들으며 칠 수 있습니다.</p><input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a" aria-label="분석할 음악 파일 선택"><p id="import-status" role="status">파일은 업로드되지 않습니다. 8분·50MB 이하를 권장합니다.</p></div></section>${jamCard}</div><button class="primary" id="start">${song.source === 'jam' ? '즉흥 합주 시작' : `${song.title} 연주`} <span>→</span></button><p class="modal-footnote">${song.source === 'file' ? '자동 생성 채보는 추정 결과이며 원곡과 맞지 않는 타격이 있을 수 있어요.' : song.source === 'jam' ? '첫 네 번은 일정한 간격으로 · 이후 반주가 연주 속도를 따라가요' : '직접 만든 짧은 반주와 채보 · 키보드 또는 터치로 연주'}</p>`);
+  const songCards = songs.map((item, index) => `<button class="song-option ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}" style="--cover-color:${item.color}"><span class="song-art" aria-hidden="true">${item.icon}</span><span class="song-description"><small class="song-number">TRACK ${String(index + 1).padStart(2, '0')} · ${item.style}</small><strong>${item.title}</strong><span>${item.bpm} BPM · ${item.meter}/4 · ${Math.round(item.duration || item.bars * item.meter * 60 / item.bpm)}초</span><em>${item.mood}</em></span><span class="card-arrow" aria-hidden="true">↗</span></button>`).join('');
+  const importedCards = importedSongs.map(item => `<button class="imported-track ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}"><span>♫</span><strong>${item.title}</strong><small>${item.bpm} BPM</small></button>`).join('');
+  const importCard = `<button class="song-option mode-option import-toggle ${importOpen ? 'selected is-open' : ''}" id="import-toggle" type="button" aria-expanded="${importOpen}" aria-controls="import-body"><span class="song-art import-art" aria-hidden="true">＋</span><span class="song-description"><small class="song-number">MY MUSIC</small><strong>내 음악으로 연주하기</strong><span>파일로 채보 만들기</span></span><span class="card-arrow" aria-hidden="true">⌄</span></button>`;
+  const importBody = `<div class="import-body" id="import-body" ${importOpen ? '' : 'hidden'}><p>MP3·WAV·M4A를 기기 안에서 분석해요. 원곡을 들으며 칠 수 있습니다.</p><input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a" aria-label="분석할 음악 파일 선택"><p id="import-status" role="status">파일은 업로드되지 않습니다. 8분·50MB 이하를 권장합니다.</p>${importedCards ? `<div class="imported-list">${importedCards}</div>` : ''}</div>`;
+  const jamCard = `<button class="song-option mode-option ${song.source === 'jam' ? 'selected' : ''}" data-song="${jamSong.id}" aria-pressed="${song.source === 'jam'}" style="--cover-color:${jamSong.color}"><span class="song-art" aria-hidden="true">${jamSong.icon}</span><span class="song-description"><small class="song-number">LIVE JAM</small><strong>즉흥 리듬</strong><span>네 번 치면 합주가 시작돼요</span><em>${jamSong.mood}</em></span><span class="card-arrow" aria-hidden="true">↗</span></button>`;
+  openModal(`<div class="library-header"><div><p class="modal-kicker">JAZZY · 오늘의 플레이리스트</p><h2>오늘은 어떤 리듬으로?</h2><p>왼쪽 삼각형 아래 선에 노트가 닿으면 연주하세요. SP는 스페이스바예요.</p></div><button class="preview-toggle" id="preview-toggle" type="button" ${song.source === 'jam' ? 'hidden' : ''}>▶ 미리 듣기</button></div><div class="library-body"><section class="library-section"><div class="library-section-title"><strong>오늘의 곡</strong><span>선택하면 정답 리듬이 재생돼요</span></div><div class="song-grid">${songCards}</div></section><section class="library-section"><div class="library-section-title"><strong>다르게 즐기기</strong><span>자유롭게 합주하기</span></div><div class="mode-grid">${ENABLE_AUDIO_IMPORT ? importCard : ''}${jamCard}${ENABLE_AUDIO_IMPORT ? importBody : ''}</div></section><div id="practice-slot">${song.source === 'jam' ? '' : practiceMarkup(true)}</div></div><div class="library-footer"><button class="primary" id="start">${song.source === 'jam' ? '즉흥 합주 시작' : `${song.title} 연주`} <span>→</span></button><p class="modal-footnote">${song.source === 'file' ? '자동 채보는 추정 결과라 원곡과 다른 타격이 있을 수 있어요.' : song.source === 'jam' ? '처음 네 번은 일정하게 · 이후 반주가 속도를 따라가요' : '직접 만든 재즈 반주 · 키보드 또는 터치로 연주'}</p></div>`);
   elements.modal.classList.add('song-library');
-  document.querySelectorAll('[data-song]').forEach(button => button.addEventListener('click', () => {
-    setSong(library.find(item => item.id === button.dataset.song));
+  const updateChoice = (nextSong) => {
+    setSong(nextSong);
     document.querySelectorAll('[data-song]').forEach(option => {
       const selected = option.dataset.song === song.id;
       option.classList.toggle('selected', selected);
       option.setAttribute('aria-pressed', String(selected));
     });
+    const isFile = song.source === 'file';
+    $('#import-toggle')?.classList.toggle('selected', isFile);
+    if (isFile) {
+      $('#import-toggle').setAttribute('aria-expanded', 'true');
+      $('#import-toggle').classList.add('is-open');
+      $('#import-body').hidden = false;
+    }
+    $('#preview-toggle').hidden = song.source === 'jam';
     $('#start').innerHTML = `${song.source === 'jam' ? '즉흥 합주 시작' : `${song.title} 연주`} <span>→</span>`;
-    $('.modal-footnote').textContent = song.source === 'jam' ? '첫 네 번은 일정한 간격으로 · 이후 반주가 연주 속도를 따라가요' : song.source === 'file' ? '자동 생성 채보는 추정 결과이며 원곡과 맞지 않는 타격이 있을 수 있어요.' : '직접 만든 짧은 반주와 채보 · 키보드 또는 터치로 연주';
-    syncPracticeControls();
-    const practicePanel = $('.modal .practice-panel');
-    if (song.source === 'jam') practicePanel?.remove();
-    else if (!practicePanel) {
-      $('#start').insertAdjacentHTML('beforebegin', practiceMarkup());
-      bindPracticeControls();
-    } else syncPracticeControls();
-  }));
-  $('#import-toggle').addEventListener('click', () => {
+    $('.modal-footnote').textContent = isFile ? '자동 채보는 추정 결과라 원곡과 다른 타격이 있을 수 있어요.' : song.source === 'jam' ? '처음 네 번은 일정하게 · 이후 반주가 속도를 따라가요' : '직접 만든 재즈 반주 · 키보드 또는 터치로 연주';
+    $('#practice-slot').innerHTML = song.source === 'jam' ? '' : practiceMarkup(true);
+    if (song.source !== 'jam') bindPracticeControls();
+    else { syncPracticeControls(); stopPreview(); }
+    if (song.source !== 'jam') startPreview();
+  };
+  document.querySelectorAll('[data-song]').forEach(button => button.addEventListener('click', () => updateChoice(library.find(item => item.id === button.dataset.song))));
+  $('#import-toggle')?.addEventListener('click', () => {
     const button = $('#import-toggle');
     const open = button.getAttribute('aria-expanded') !== 'true';
     button.setAttribute('aria-expanded', String(open));
-    $('.import-option').classList.toggle('is-open', open);
+    button.classList.toggle('is-open', open);
     $('#import-body').hidden = !open;
-    if (open) $('#audio-file').focus();
+    if (open) { stopPreview(); $('#audio-file').focus(); }
   });
   $('#start').addEventListener('click', start);
-  if (song.source !== 'jam') {
-    $('#start').insertAdjacentHTML('beforebegin', practiceMarkup());
-    bindPracticeControls();
-  } else syncPracticeControls();
-  $('#audio-file').addEventListener('change', importAudioFile);
+  $('#preview-toggle').addEventListener('click', () => {
+    if (preview.song) stopPreview();
+    else startPreview();
+  });
+  if (song.source !== 'jam') bindPracticeControls();
+  else syncPracticeControls();
+  $('#audio-file')?.addEventListener('change', importAudioFile);
 }
 
 async function importAudioFile(event) {
@@ -263,6 +374,7 @@ function startTrack(elapsed, at) {
 }
 
 async function start() {
+  stopPreview();
   stopTrack();
   audio.stopAll();
   const now = await audio.unlock();
@@ -419,12 +531,7 @@ function scheduleBacking(time) {
     if (beat < 0) {
       audio.click(at, beat === -1);
     } else if (song.source !== 'file') {
-      const bar = Math.floor(beat / song.meter);
-      const step = beat % song.meter;
-      const chord = song.chords[bar % song.chords.length];
-      const bassNote = step === 0 ? chord[0] - 12 : chord[step % chord.length] - 12;
-      audio.bass(at, 440 * 2 ** ((bassNote - 69) / 12));
-      if (step === 0 || (song.meter === 4 && step === 2)) audio.chord(at, chord, BEAT * 1.5);
+      scheduleSongBackingBeat(audio, song, beat, at, BEAT);
     }
   }
   state.scheduledBeat = Math.max(state.scheduledBeat, ahead);
@@ -531,6 +638,7 @@ function finish() {
 }
 
 function openLibrary() {
+  stopPreview();
   cancelAnimationFrame(state.raf);
   stopTrack();
   audio.context?.close();
@@ -604,7 +712,7 @@ $('#guide').addEventListener('click', () => {
 });
 $('#help').addEventListener('click', () => {
   if (state.status === 'playing') pause();
-  openModal(`<p class="modal-kicker">연주 방법</p><h2>악보를 보고, 드럼을 쳐요.</h2><p>노트가 왼쪽 삼각형 아래 선에 닿을 때 해당 드럼을 터치하세요. 칠 위치는 1초 전에 나타나고, 0.5초 전에 선명해져요.</p><div class="key-list"><span>하이햇 <kbd>S</kbd></span><span>스네어 <kbd>D</kbd></span><span>킥 <kbd>Space</kbd></span><span>라이드 <kbd>L</kbd></span></div><button class="primary" id="close-help">${state.status === 'paused' ? '계속 연주' : state.status === 'ready' ? '연주 시작' : '확인'} <span>→</span></button>`);
+  openModal(`<p class="modal-kicker">연주 방법</p><h2>악보를 보고, 드럼을 쳐요.</h2><p>노트가 왼쪽 삼각형 아래 선에 닿을 때 해당 드럼을 터치하세요. 칠 위치는 1초 전에 나타나고, 0.5초 전에 선명해져요.</p><div class="key-list"><span>하이햇 <kbd>D</kbd></span><span>스네어 <kbd>V</kbd></span><span>킥 <kbd>Space</kbd></span><span>라이드 <kbd>K</kbd></span></div><button class="primary" id="close-help">${state.status === 'paused' ? '계속 연주' : state.status === 'ready' ? '연주 시작' : '확인'} <span>→</span></button>`);
   $('#close-help').addEventListener('click', state.status === 'paused' ? resume : state.status === 'ready' ? start : closeModal);
 });
 

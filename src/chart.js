@@ -1,14 +1,14 @@
 export const INSTRUMENTS = {
-  hh: { label: '하이햇', key: 'S', color: '#b68a3d' },
-  snare: { label: '스네어', key: 'D', color: '#bf6f50' },
+  hh: { label: '하이햇', key: 'D', color: '#b68a3d' },
+  snare: { label: '스네어', key: 'V', color: '#bf6f50' },
   kick: { label: '킥', key: 'Space', color: '#3c765f' },
-  tom1: { label: '하이 탐', key: 'F', color: '#818876' },
-  tom2: { label: '로우 탐', key: 'J', color: '#818876' },
-  floor: { label: '플로어 탐', key: 'K', color: '#818876' },
-  crash: { label: '크래시 1', key: 'E', color: '#b68a3d' },
-  crash2: { label: '크래시 2', key: 'I', color: '#c6944b' },
-  ride: { label: '라이드', key: 'L', color: '#b68a3d' },
-  hhPedal: { label: '하이햇 페달', key: 'G', color: '#b68a3d' },
+  tom1: { label: '하이 탐', key: 'G', color: '#818876' },
+  tom2: { label: '로우 탐', key: 'H', color: '#818876' },
+  floor: { label: '플로어 탐', key: 'N', color: '#818876' },
+  crash: { label: '크래시 1', key: 'F', color: '#b68a3d' },
+  crash2: { label: '크래시 2', key: 'J', color: '#c6944b' },
+  ride: { label: '라이드', key: 'K', color: '#b68a3d' },
+  hhPedal: { label: '하이햇 페달', key: 'C', color: '#b68a3d' },
 };
 
 // One song timeline can later hold separate instrument parts for ensemble play.
@@ -26,6 +26,40 @@ const bossa = {
   chords: [[50, 57, 60, 64], [43, 53, 59, 64], [48, 55, 59, 62], [45, 55, 61, 64]],
 };
 
+// A twenty-bar small-combo chorus: each bar has its own comping and fill choices.
+const blueNoteRide = {
+  a: [0, 1, 1 + 2 / 3, 2, 3, 3 + 2 / 3],
+  b: [0, 1, 1 + 2 / 3, 2, 2 + 2 / 3, 3],
+  c: [0, 2 / 3, 1, 2, 3, 3 + 2 / 3],
+  d: [0, 1, 2, 2 + 2 / 3, 3],
+  e: [0, 1, 1 + 2 / 3, 2, 3],
+  f: [0, 1, 1 + 2 / 3, 2, 2 + 2 / 3, 3, 3 + 2 / 3],
+  g: [0, 1, 2, 3],
+  h: [0, 2 / 3, 1, 1 + 2 / 3, 2, 3],
+};
+const blueNoteBars = [
+  { r: 'a', k: [0], s: [1 + 2 / 3], c: 'crash' },
+  { r: 'b', k: [0, 2 + 2 / 3], s: [3], g: [1 + 2 / 3] },
+  { r: 'c', k: [0], s: [1, 3 + 2 / 3] },
+  { r: 'd', k: [0, 2], s: [2 + 2 / 3], t: [['tom1', 3 + 1 / 3]] },
+  { r: 'f', k: [0], s: [1 + 2 / 3, 3], g: [2 + 1 / 3] },
+  { r: 'e', k: [0, 3 + 1 / 3], s: [2], foot: [1] },
+  { r: 'h', k: [0, 2 + 2 / 3], s: [1 + 2 / 3], g: [3 + 1 / 3] },
+  { r: 'g', k: [0], s: [1, 2 + 2 / 3], t: [['tom1', 3], ['tom2', 3 + 2 / 3]] },
+  { r: 'b', k: [0, 2], s: [3 + 1 / 3], c: 'crash2' },
+  { r: 'a', k: [0], s: [1, 3], g: [2 + 2 / 3] },
+  { r: 'd', k: [0, 3], s: [1 + 2 / 3], foot: [3] },
+  { r: 'f', k: [0, 2 + 1 / 3], s: [2, 3 + 2 / 3], t: [['floor', 3 + 1 / 3]] },
+  { r: 'c', k: [0], s: [1 + 2 / 3, 3], g: [2 + 1 / 3] },
+  { r: 'e', k: [0, 2], s: [3 + 2 / 3], foot: [1, 2] },
+  { r: 'h', k: [0, 2 + 2 / 3], s: [1, 3 + 1 / 3] },
+  { r: 'g', k: [0], s: [2 + 2 / 3], t: [['tom1', 3], ['tom2', 3 + 1 / 3], ['floor', 3 + 2 / 3]] },
+  { r: 'f', k: [0, 2], s: [1 + 2 / 3, 3], c: 'crash' },
+  { r: 'b', k: [0], s: [2 + 1 / 3], g: [3 + 2 / 3] },
+  { r: 'a', k: [0, 3], s: [1, 2 + 2 / 3], foot: [1] },
+  { r: 'd', k: [0, 2], s: [1 + 2 / 3], t: [['tom1', 3], ['tom2', 3 + 1 / 3], ['floor', 3 + 2 / 3]], c: 'crash2' },
+];
+
 export const songs = [bossa, {
   id: 'after-hours', title: '막차 뒤 스윙', style: '재즈 스윙', difficulty: '기본',
   bpm: 108, bars: 16, meter: 4, mood: '라이드 위에서 통통 튀는 늦은 밤',
@@ -41,15 +75,37 @@ export const songs = [bossa, {
   bpm: 102, bars: 16, meter: 4, mood: '엇박 킥과 단단한 백비트의 대화',
   color: '#a25e49', icon: '◉',
   chords: [[40, 55, 62, 66], [45, 55, 59, 64], [50, 60, 64, 67], [47, 57, 63, 67]],
+}, {
+  id: 'blue-note-walk', title: '새벽의 블루 노트', style: '모던 재즈', difficulty: '변주',
+  bpm: 112, bars: 20, meter: 4, mood: '스윙과 엇박, 매 마디 달라지는 재즈 대화',
+  color: '#344d70', icon: '♭',
+  chords: [
+    [48, 55, 59, 64], [45, 52, 55, 60], [50, 57, 60, 65], [43, 53, 59, 62],
+    [48, 55, 59, 64], [52, 56, 62, 67], [45, 52, 55, 60], [45, 55, 61, 64],
+    [50, 57, 60, 65], [43, 53, 59, 68], [52, 59, 62, 67], [45, 55, 61, 64],
+    [50, 57, 60, 65], [53, 56, 60, 62], [48, 55, 59, 64], [48, 58, 64, 67],
+    [53, 60, 64, 69], [53, 56, 60, 62], [52, 59, 62, 67], [43, 53, 59, 62],
+  ],
 }].map(item => ({ ...item, parts: { drums: createDrumChart(item) } }));
 
 function createDrumChart(song) {
   const events = [];
   let id = 0;
-  const add = (beat, instrument) => events.push({ id: ++id, time: beat * 60 / song.bpm, beat, instrument });
+  const add = (beat, instrument, velocity = 1) => events.push({ id: ++id, time: beat * 60 / song.bpm, beat, instrument, velocity });
   for (let bar = 0; bar < song.bars; bar++) {
     const base = bar * song.meter;
-    if (song.id === 'after-hours') {
+    if (song.id === 'blue-note-walk') {
+      const sketch = blueNoteBars[bar];
+      const cymbal = bar < 4 || (bar >= 12 && bar < 16) ? 'ride' : 'hh';
+      const pulse = cymbal === 'ride' ? blueNoteRide[sketch.r].filter((_, index) => index % 2 === 0) : blueNoteRide[sketch.r];
+      pulse.forEach(offset => add(base + offset, cymbal, offset % 1 === 0 ? 0.64 : 0.46));
+      (sketch.foot || [1, 3]).forEach(offset => add(base + offset, 'hhPedal', 0.42));
+      sketch.k.forEach(offset => add(base + offset, 'kick', 0.56));
+      sketch.s.forEach(offset => add(base + offset, 'snare', 0.78));
+      sketch.g?.forEach(offset => add(base + offset, 'snare', 0.3));
+      sketch.t?.forEach(([instrument, offset]) => add(base + offset, instrument, 0.66));
+      if (sketch.c) add(base, sketch.c, 0.7);
+    } else if (song.id === 'after-hours') {
       [0, 1, 1 + 2 / 3, 2, 3, 3 + 2 / 3].forEach(offset => add(base + offset, 'ride'));
       [1, 3].forEach(offset => add(base + offset, 'hhPedal'));
       add(base, 'kick');
