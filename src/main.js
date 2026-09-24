@@ -62,7 +62,7 @@ const state = {
   lastFeedback: '',
   feedbackUntil: 0,
   guide: true,
-  lookahead: 6,
+  lookahead: 4,
   notationMode: 'scroll',
   raf: 0,
 };
@@ -81,7 +81,7 @@ app.innerHTML = `
       </div>
 
       <div class="notation-wrap">
-        <div class="practice-strip"><button id="tempo-settings" class="library-button">연주 BPM · ${BPM}</button><label>악보 방식 <select id="notation-mode-main"><option value="scroll">노트 이동</option><option value="follow">판정선 이동</option></select></label><label class="scroll-choice">악보 속도 <select id="scroll-speed"><option value="6" selected>느리게 · 6초 미리보기</option><option value="4">보통 · 4초 미리보기</option><option value="2">빠르게 · 2초 미리보기</option></select></label></div>
+        <div class="practice-strip"><button id="tempo-settings" class="library-button">연주 BPM · ${BPM}</button><label>악보 방식 <select id="notation-mode-main"><option value="scroll">노트 이동</option><option value="follow">판정선 이동</option></select></label><label class="scroll-choice">악보 속도 <select id="scroll-speed"><option value="6">느리게 · 6초 미리보기</option><option value="4" selected>보통 · 4초 미리보기</option><option value="2">빠르게 · 2초 미리보기</option></select></label></div>
         <div class="notation" id="notation" aria-label="다가오는 드럼 노트"><div class="staff-lines"></div><div class="playhead" aria-label="현재 연주 위치"></div><div id="beat-lines"></div><div id="notes-layer"></div></div>
       </div>
 
