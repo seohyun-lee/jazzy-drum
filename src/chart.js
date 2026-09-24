@@ -16,7 +16,7 @@ const bossa = {
   id: 'evening-bossa',
   title: '퇴근길 보사노바',
   style: '보사노바',
-  difficulty: 'EASY+', level: 2,
+  difficulty: 'EASY', level: 1,
   bpm: 84,
   bars: 12,
   meter: 4,
@@ -66,7 +66,7 @@ export const songs = [bossa, {
   color: '#526b9b', icon: '☾',
   chords: [[50, 57, 60, 64], [43, 53, 59, 63], [48, 55, 59, 64], [45, 55, 61, 65]],
 }, {
-  id: 'blue-waltz', title: '푸른 골목의 왈츠', style: '재즈 왈츠', difficulty: 'EASY', level: 1,
+  id: 'blue-waltz', title: '푸른 골목의 왈츠', style: '재즈 왈츠', difficulty: 'EASY+', level: 2,
   bpm: 96, bars: 16, meter: 3, mood: '하나, 둘, 셋. 세 박자로 걷는 골목',
   color: '#537e76', icon: '≋',
   chords: [[53, 60, 64, 67], [46, 56, 62, 65], [52, 58, 62, 67], [45, 55, 61, 65]],
