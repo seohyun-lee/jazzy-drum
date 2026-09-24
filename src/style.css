@@ -228,6 +228,25 @@
 :fullscreen .fullscreen-keymap span{white-space:nowrap}
 :fullscreen .fullscreen-keymap kbd{font-size:9px;padding:0 3px}
 @media(max-height:430px) and (orientation:landscape){:fullscreen .fullscreen-keymap{right:4px;bottom:3px;width:min(61vw,500px);gap:1px 6px;padding:3px 5px;font-size:8px}:fullscreen .fullscreen-keymap kbd{font-size:8px}}
+.result-head>div:first-child{min-width:0}
+@media(orientation:landscape) and (max-height:600px){
+  .modal.result-modal{width:min(88vw,620px);padding:17px 20px 15px;border-radius:18px}
+  .modal.result-modal .result-head{display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .modal.result-modal .result-head h2{font-size:clamp(17px,2.5vw,23px);margin:3px 0 4px}
+  .modal.result-modal .result-head p{margin:0;font-size:11px;line-height:1.35}
+  .modal.result-modal .result-head .modal-kicker{font-size:9px!important}
+  .modal.result-modal .score{position:static;flex:none;display:flex;align-items:baseline;gap:6px;margin:0}
+  .modal.result-modal .score strong{font-size:clamp(38px,6vw,52px)}
+  .modal.result-modal .score small{font-size:18px}
+  .modal.result-modal .score span{font-size:10px}
+  .modal.result-modal .result-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:12px 0;padding:0;border:0}
+  .modal.result-modal .result-stats span{gap:3px;align-items:center;padding:8px 4px;border-radius:9px;background:#f1f1e7;text-align:center;font-size:10px}
+  .modal.result-modal .result-stats b{font-size:17px}
+  .modal.result-modal .result-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .modal.result-modal .result-actions .primary,.modal.result-modal .result-actions .text-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:36px;margin:0;padding:8px 12px;border-radius:9px;font-size:12px;text-decoration:none}
+  .modal.result-modal .result-actions .primary{justify-content:space-between}
+  .modal.result-modal .result-actions .text-button{border:1px solid #c5d1c4;background:#f7f8f1;color:#315841;font-weight:700}
+}
 .card-arrow{align-self:center;color:#829483;font-size:18px;line-height:1;text-align:center}
 .modal.song-library .song-option.selected .card-arrow,.modal.song-library .song-option.is-open .card-arrow{color:#2e6847}
 .modal.song-library .mode-option{border-style:solid}

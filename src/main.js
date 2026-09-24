@@ -630,7 +630,7 @@ function finish() {
   elements.pause.disabled = true;
   elements.targetLayer.innerHTML = '';
   if (song.source === 'jam') {
-    openModal(`<p class="modal-kicker">LIVE JAM · 합주 완료</p><h2>오늘의 즉흥 연주를 마쳤어요.</h2><p>${formatTime(DURATION)} 동안 반주와 함께 연주했어요${jam.started ? ` · 마지막 템포 ${Math.round(BPM)} BPM` : ''}.</p><button class="primary" id="retry">다시 합주 <span>↻</span></button><button class="text-button" id="choose-another">다른 곡 고르기</button>`);
+    openModal(`<div class="result-head"><div><p class="modal-kicker">LIVE JAM · 합주 완료</p><h2>오늘의 즉흥 연주를 마쳤어요.</h2><p>${formatTime(DURATION)} 동안 반주와 함께 연주했어요${jam.started ? ` · 마지막 템포 ${Math.round(BPM)} BPM` : ''}.</p></div></div><div class="result-actions"><button class="primary" id="retry">다시 합주 <span>↻</span></button><button class="text-button" id="choose-another">다른 곡 고르기</button></div>`);
     elements.modal.classList.add('result-modal');
     $('#retry').addEventListener('click', start);
     $('#choose-another').addEventListener('click', openLibrary);
@@ -639,7 +639,7 @@ function finish() {
   const { perfect, great, good, miss } = state.results;
   const count = perfect + great + good + miss;
   const accuracy = count ? Math.round((perfect + great * 0.8 + good * 0.5) / count * 100) : 0;
-  openModal(`<p class="modal-kicker">오늘의 리듬 완료</p><h2>오늘, 리듬을 하나 배웠어요.</h2><p>${song.title} · ${song.style}</p><div class="score"><strong>${accuracy}<small>%</small></strong><span>정확도</span></div><div class="result-stats"><span>좋은 박자 <b>${perfect + great + good}</b></span><span>최고 연속 <b>${state.maxCombo}</b></span><span>놓친 박자 <b>${miss}</b></span></div><button class="primary" id="retry">한 번 더 <span>↻</span></button><button class="text-button" id="choose-another">다른 곡 고르기</button>`);
+  openModal(`<div class="result-head"><div><p class="modal-kicker">오늘의 리듬 완료</p><h2>오늘, 리듬을 하나 배웠어요.</h2><p>${song.title} · ${song.style}</p></div><div class="score"><strong>${accuracy}<small>%</small></strong><span>정확도</span></div></div><div class="result-stats"><span>좋은 박자 <b>${perfect + great + good}</b></span><span>최고 연속 <b>${state.maxCombo}</b></span><span>놓친 박자 <b>${miss}</b></span></div><div class="result-actions"><button class="primary" id="retry">한 번 더 <span>↻</span></button><button class="text-button" id="choose-another">다른 곡 고르기</button></div>`);
   elements.modal.classList.add('result-modal');
   $('#retry').addEventListener('click', start);
   $('#choose-another').addEventListener('click', openLibrary);

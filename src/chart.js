@@ -1,14 +1,14 @@
 export const INSTRUMENTS = {
-  hh: { label: '하이햇', key: 'D', color: '#b68a3d' },
+  hh: { label: '하이햇', key: 'D', color: '#637b4b' },
   snare: { label: '스네어', key: 'V', color: '#bf6f50' },
   kick: { label: '킥', key: 'Space', color: '#3c765f' },
   tom1: { label: '하이 탐', key: 'G', color: '#818876' },
   tom2: { label: '로우 탐', key: 'H', color: '#818876' },
   floor: { label: '플로어 탐', key: 'N', color: '#818876' },
-  crash: { label: '크래시 1', key: 'F', color: '#b68a3d' },
-  crash2: { label: '크래시 2', key: 'J', color: '#c6944b' },
-  ride: { label: '라이드', key: 'K', color: '#b68a3d' },
-  hhPedal: { label: '하이햇 페달', key: 'C', color: '#b68a3d' },
+  crash: { label: '크래시 1', key: 'F', color: '#a45e32' },
+  crash2: { label: '크래시 2', key: 'J', color: '#765d91' },
+  ride: { label: '라이드', key: 'K', color: '#436b8d' },
+  hhPedal: { label: '하이햇 페달', key: 'C', color: '#637b4b' },
 };
 
 // One song timeline can later hold separate instrument parts for ensemble play.
