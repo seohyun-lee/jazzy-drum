@@ -150,7 +150,9 @@ function bindPracticeControls() {
 
 function showReady() {
   const library = [...songs, ...importedSongs];
-  openModal(`<p class="modal-kicker">JAZZY · 오늘의 플레이리스트</p><h2>오늘은 어떤 리듬으로?</h2><p>짧은 재즈 한 곡으로, 일상에 박자를 더해요.</p><div class="song-grid">${library.map(item => `<button class="song-option ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}" style="--cover-color:${item.color}"><span class="song-art" aria-hidden="true">${item.icon}</span><span class="song-description"><strong>${item.title}</strong><span>${item.style} · ${item.bpm} BPM · ${item.meter}/4</span><small>${item.difficulty} · ${Math.round(item.duration || item.bars * item.meter * 60 / item.bpm)}초</small></span></button>`).join('')}</div><section class="import-panel"><strong>내 음악으로 연주하기</strong><p>MP3·WAV·M4A를 선택하면 기기 안에서 BPM과 드럼 타격을 추정해요. 원곡을 들으며 칠 수 있습니다.</p><input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a" aria-label="분석할 음악 파일 선택"><p id="import-status" role="status">파일은 업로드되지 않습니다. 8분·50MB 이하를 권장합니다.</p></section><p class="selected-mood" id="selected-mood">${song.mood}</p><button class="primary" id="start">${song.title} 연주 <span>→</span></button><p class="modal-footnote">${song.source === 'file' ? '자동 생성 채보는 추정 결과이며 원곡과 맞지 않는 타격이 있을 수 있어요.' : '직접 만든 짧은 반주와 채보 · 키보드 또는 터치로 연주'}</p>`);
+  const importOpen = song.source === 'file';
+  const songCards = library.map(item => `<button class="song-option ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}" style="--cover-color:${item.color}"><span class="song-art" aria-hidden="true">${item.icon}</span><span class="song-description"><strong>${item.title}</strong><span>${item.style} · ${item.bpm} BPM · ${item.meter}/4</span><small>${item.difficulty} · ${Math.round(item.duration || item.bars * item.meter * 60 / item.bpm)}초</small><em>${item.mood}</em></span></button>`).join('');
+  openModal(`<p class="modal-kicker">JAZZY · 오늘의 플레이리스트</p><h2>오늘은 어떤 리듬으로?</h2><p>짧은 재즈 한 곡으로, 일상에 박자를 더해요.</p><div class="song-grid">${songCards}<section class="import-option ${importOpen ? 'is-open' : ''}"><button class="import-toggle" id="import-toggle" type="button" aria-expanded="${importOpen}" aria-controls="import-body"><span class="song-art import-art" aria-hidden="true">＋</span><span class="song-description"><strong>내 음악으로 연주하기</strong><span>MP3 · WAV · M4A</span><small>자동 BPM·드럼 채보 만들기</small></span><span class="import-chevron" aria-hidden="true">⌄</span></button><div class="import-body" id="import-body" ${importOpen ? '' : 'hidden'}><p>오디오를 선택하면 기기 안에서 BPM과 드럼 타격을 추정해요. 원곡을 들으며 칠 수 있습니다.</p><input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a" aria-label="분석할 음악 파일 선택"><p id="import-status" role="status">파일은 업로드되지 않습니다. 8분·50MB 이하를 권장합니다.</p></div></section></div><button class="primary" id="start">${song.title} 연주 <span>→</span></button><p class="modal-footnote">${song.source === 'file' ? '자동 생성 채보는 추정 결과이며 원곡과 맞지 않는 타격이 있을 수 있어요.' : '직접 만든 짧은 반주와 채보 · 키보드 또는 터치로 연주'}</p>`);
   elements.modal.classList.add('song-library');
   document.querySelectorAll('[data-song]').forEach(button => button.addEventListener('click', () => {
     setSong(library.find(item => item.id === button.dataset.song));
@@ -159,18 +161,20 @@ function showReady() {
       option.classList.toggle('selected', selected);
       option.setAttribute('aria-pressed', String(selected));
     });
-    $('#selected-mood').textContent = song.mood;
     $('#start').innerHTML = `${song.title} 연주 <span>→</span>`;
     syncPracticeControls();
   }));
+  $('#import-toggle').addEventListener('click', () => {
+    const button = $('#import-toggle');
+    const open = button.getAttribute('aria-expanded') !== 'true';
+    button.setAttribute('aria-expanded', String(open));
+    $('.import-option').classList.toggle('is-open', open);
+    $('#import-body').hidden = !open;
+    if (open) $('#audio-file').focus();
+  });
   $('#start').addEventListener('click', start);
-  $('#start').insertAdjacentHTML('beforebegin', `<div class="sound-preview"><strong>소리 미리 듣기</strong><div class="preview-buttons">${['kick', 'snare', 'hh', 'crash', 'crash2', 'ride'].map(id => `<button data-preview="${id}">${INSTRUMENTS[id].label}</button>`).join('')}</div></div>`);
-  $('.sound-preview').insertAdjacentHTML('beforebegin', practiceMarkup());
+  $('#start').insertAdjacentHTML('beforebegin', practiceMarkup());
   bindPracticeControls();
-  document.querySelectorAll('[data-preview]').forEach(button => button.addEventListener('click', async () => {
-    await audio.unlock();
-    audio.play(button.dataset.preview);
-  }));
   $('#audio-file').addEventListener('change', importAudioFile);
 }
 

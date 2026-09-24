@@ -6,7 +6,7 @@
 .note-kick{width:42px;font-size:8px;letter-spacing:-.3px}
 /* Approach ring meets the target edge at the scheduled hit. */
 .target .approach{inset:0}
-.sound-choice{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.sound-choice select,.sound-preview select{font:inherit;border:1px solid #a6b4a0;border-radius:8px;background:#f4f0e7;color:#254437;padding:6px 8px}.sound-preview{padding:12px;background:#f1eee3;border-radius:12px;margin:0 0 16px;font-size:12px}.sound-preview>label{margin-right:10px;font-weight:700}.preview-buttons{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}.preview-buttons>span{font-size:10px;color:#65736a}.preview-buttons button{border:1px solid #bac4b2;background:#fffaf0;border-radius:7px;padding:5px 8px;font-size:11px;color:#254437}.kit-footer{flex-wrap:wrap}.modal{max-height:calc(100dvh - 36px);overflow-y:auto}@media(max-width:720px){.sound-choice{order:3;width:100%}}
+.kit-footer{flex-wrap:wrap}.modal{max-height:calc(100dvh - 36px);overflow-y:auto}
 /* Three cymbals have independent visible strike regions. */
 .zone-crash{left:13%;top:1%;width:25%;height:19%}
 .zone-crash2{left:75%;top:1%;width:23%;height:16%}
@@ -24,7 +24,8 @@
 .song-description{min-width:0;display:flex;flex-direction:column;gap:4px;line-height:1.25}
 .song-description strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .song-description>span,.song-description small{font-size:10px;color:#738074}
-.modal .selected-mood{margin:5px 0 13px;font-size:12px;color:#536b58}
+.song-description em{display:none;margin-top:2px;color:#496557;font-size:10px;font-style:normal;line-height:1.35}
+.song-option.selected .song-description em{display:block}
 @media(max-width:640px){.song-option{gap:7px;padding:6px}.song-option.selected{padding:5px}.song-art{width:46px;height:46px;font-size:26px}.song-description strong{font-size:11px}.song-description>span,.song-description small{font-size:9px}.song-grid{gap:7px}.song-actions{gap:5px}.library-button{padding:5px 6px;font-size:10px}}
 /* Ride moved clear of the rack toms and the floor tom. */
 .zone-crash2{left:75%;top:1%;width:23%;height:16%}
@@ -70,11 +71,18 @@
 .scroll-choice{margin-top:11px;justify-content:space-between;font-size:11px}
 @media(max-width:440px){.practice-strip{font-size:10px}.practice-strip select{padding:5px}.practice-panel{padding:10px}.tempo-presets{gap:4px}.tempo-presets button{padding:5px 6px}}
 
-.import-panel{margin:14px 0 18px;padding:15px;border:1px solid #d7dfd0;border-radius:14px;background:#f2f5ed}
-.import-panel>strong{display:block;font-size:14px;color:#244734;margin-bottom:5px}
-.modal .import-panel p{font-size:11px;line-height:1.5;margin:0 0 10px}
-.import-panel input[type=file]{display:block;width:100%;font:inherit;font-size:12px;color:#315542}
-.modal .import-panel #import-status{margin:7px 0 12px;color:#426652}
+.import-option{min-width:0;border:1px solid #d9dfd1;background:#fffdf7;border-radius:14px;overflow:hidden;color:#213a2d}
+.import-option.is-open{grid-column:1/-1;border-color:#9caf9c;background:#f4f8ed}
+.import-toggle{display:flex;align-items:center;gap:12px;width:100%;min-width:0;border:0;background:transparent;padding:9px;color:inherit;text-align:left}
+.import-art{background:#688578;font-family:inherit;font-size:27px}
+.import-chevron{margin-left:auto;padding:0 5px;color:#6f8075;font-size:20px;transition:transform .2s ease}
+.import-toggle[aria-expanded=true] .import-chevron{transform:rotate(180deg)}
+.import-body{padding:0 14px 13px;border-top:1px solid #dbe3d6}
+.import-body[hidden]{display:none}
+.modal .import-body p{font-size:11px;line-height:1.5;margin:10px 0}
+.import-body input[type=file]{display:block;width:100%;font:inherit;font-size:12px;color:#315542}
+.modal .import-body #import-status{margin:7px 0 0;color:#426652}
+@media(max-width:640px){.import-toggle{gap:7px;padding:6px}.import-chevron{font-size:17px}.import-body{padding:0 10px 10px}}
 
 :fullscreen{background:#19342c;overflow:hidden}
 :fullscreen .shell{display:flex;flex-direction:column;width:100%;height:100dvh;max-width:none;padding:0}
