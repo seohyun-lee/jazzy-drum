@@ -1,14 +1,15 @@
 export const INSTRUMENTS = {
-  hh: { label: '하이햇', key: 'D', color: '#637b4b' },
-  snare: { label: '스네어', key: 'V', color: '#bf6f50' },
-  kick: { label: '킥', key: 'Space', color: '#3c765f' },
-  tom1: { label: '하이 탐', key: 'G', color: '#818876' },
-  tom2: { label: '로우 탐', key: 'H', color: '#818876' },
-  floor: { label: '플로어 탐', key: 'N', color: '#818876' },
-  crash: { label: '크래시 1', key: 'F', color: '#a45e32' },
-  crash2: { label: '크래시 2', key: 'J', color: '#765d91' },
-  ride: { label: '라이드', key: 'K', color: '#436b8d' },
-  hhPedal: { label: '하이햇 페달', key: 'C', color: '#637b4b' },
+  // Colors follow the physical kit from left (red) to right (pink); kick stays neutral.
+  hh: { label: '하이햇', key: 'D', color: '#BA3F4B' },
+  snare: { label: '스네어', key: 'V', color: '#8C6B17' },
+  kick: { label: '킥', key: 'Space', color: '#5F6870' },
+  tom1: { label: '하이 탐', key: 'G', color: '#39795A' },
+  tom2: { label: '로우 탐', key: 'H', color: '#27758D' },
+  floor: { label: '플로어 탐', key: 'N', color: '#6E4A98' },
+  crash: { label: '크래시 1', key: 'F', color: '#A75B25' },
+  crash2: { label: '크래시 2', key: 'J', color: '#465CB0' },
+  ride: { label: '라이드', key: 'K', color: '#A64579' },
+  hhPedal: { label: '하이햇 페달', key: 'C', color: '#BA3F4B' },
 };
 
 // One song timeline can later hold separate instrument parts for ensemble play.
