@@ -86,7 +86,7 @@ app.innerHTML = `
       </div>
 
       <div class="play-surface">
-        <div class="surface-heading"><span class="live-dot"></span><span id="feedback">편하게 한 박자씩 시작해요</span><span id="combo">0번 연속</span></div>
+        <div class="surface-heading"><span class="live-dot"></span><span id="feedback">편하게 한 박자씩 시작해요</span><span id="combo">0번 콤보</span></div>
         <div class="kit" id="kit" aria-label="연주할 드럼 세트">
           <img src="${drumKitImage}" alt="양쪽 위의 크래시 1·2, 오른쪽 아래의 큰 라이드와 두 페달이 보이는 드럼 세트" draggable="false" />
           <div id="target-layer"></div>
@@ -645,7 +645,7 @@ function frame() {
   renderNotation(time);
   renderTargets(time);
   elements.clock.textContent = `${formatTime(Math.max(0, Math.min(time, DURATION)))} / ${formatTime(DURATION)}`;
-  elements.combo.textContent = song.source === 'jam' ? (jam.started ? `${Math.round(BPM)} BPM` : `${Math.min(4, jam.taps.length)} / 4`) : `${state.combo}번 연속`;
+  elements.combo.textContent = song.source === 'jam' ? (jam.started ? `${Math.round(BPM)} BPM` : `${Math.min(4, jam.taps.length)} / 4`) : `${state.combo}번 콤보`;
   const idleFeedback = song.source === 'jam' ? (jam.started ? '반주가 연주 속도를 듣고 있어요' : '아무 드럼이나 네 번 일정하게 쳐보세요') : '리듬을 따라 연주해요';
   elements.feedback.textContent = time < 0 ? '곧 시작해요' : performance.now() < state.feedbackUntil ? state.lastFeedback : idleFeedback;
   if (time >= DURATION + 0.5) return finish();
@@ -672,7 +672,7 @@ function finish() {
   const { perfect, great, good, miss } = state.results;
   const count = perfect + great + good + miss;
   const accuracy = count ? Math.round((perfect + great * 0.8 + good * 0.5) / count * 100) : 0;
-  openModal(`<div class="result-head"><div><p class="modal-kicker">오늘의 리듬 완료</p><h2>오늘, 리듬을 하나 배웠어요.</h2><p>${song.title} · ${song.style}</p></div><div class="score"><strong>${accuracy}<small>%</small></strong><span>정확도</span></div></div><div class="result-stats"><span>좋은 박자 <b>${perfect + great + good}</b></span><span>최고 연속 <b>${state.maxCombo}</b></span><span>놓친 박자 <b>${miss}</b></span></div><div class="result-actions"><button class="primary" id="retry">한 번 더 <span>↻</span></button><button class="text-button" id="choose-another">다른 곡 고르기</button></div>`);
+  openModal(`<div class="result-head"><div><p class="modal-kicker">오늘의 리듬 완료</p><h2>오늘, 리듬을 하나 배웠어요.</h2><p>${song.title} · ${song.style}</p></div><div class="score"><strong>${accuracy}<small>%</small></strong><span>정확도</span></div></div><div class="result-stats"><span>좋은 박자 <b>${perfect + great + good}</b></span><span>최고 콤보 <b>${state.maxCombo}</b></span><span>놓친 박자 <b>${miss}</b></span></div><div class="result-actions"><button class="primary" id="retry">한 번 더 <span>↻</span></button><button class="text-button" id="choose-another">다른 곡 고르기</button></div>`);
   elements.modal.classList.add('result-modal');
   $('#retry').addEventListener('click', start);
   $('#choose-another').addEventListener('click', openLibrary);
