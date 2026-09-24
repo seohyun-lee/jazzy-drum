@@ -42,6 +42,12 @@ const hitZones = [
   ['crash2', '크래시 2'], ['ride', '라이드'], ['snare', '스네어'], ['kick', '킥'], ['floor', '플로어 탐'],
   ['hhPedal', '하이햇 페달'], ['kickPedal', '킥 페달'],
 ];
+const keyGuide = [
+  ['크래시 1', 'F'], ['하이햇', 'D'], ['하이햇 페달', 'C'],
+  ['스네어', 'V'], ['하이 탐', 'G'], ['로우 탐', 'H'],
+  ['크래시 2', 'J'], ['라이드', 'K'], ['플로어 탐', 'N'], ['킥·킥 페달', 'Space'],
+];
+const fullKeyGuide = keyGuide.map(([label, key]) => `<span>${label} <kbd>${key}</kbd></span>`).join('');
 
 const state = {
   status: 'ready',
@@ -85,10 +91,9 @@ app.innerHTML = `
           ${hitZones.map(([id, label]) => `<button class="hit-zone zone-${id}" data-instrument="${id === 'kickPedal' ? 'kick' : id}" aria-label="${label} 연주"></button>`).join('')}
         </div>
         <div class="kit-footer"><button id="guide" class="pill is-on" aria-pressed="true">◎ 가이드 켜짐</button><span>하이햇 <kbd>D</kbd> · 스네어 <kbd>V</kbd> · 킥 <kbd>Space</kbd> · 라이드 <kbd>K</kbd></span></div>
+        <div class="fullscreen-keymap" aria-label="키보드 악기 배치">${fullKeyGuide}</div>
       </div>
     </section>
-
-    <div class="below"><div><strong>오늘, 리듬을 하나 배워봐요.</strong><span>짧게 즐기고, 조금씩 익숙해지는 재즈 드럼.</span></div><span class="future">자유 연주와 합주는 다음 이야기 ↗</span></div>
   </main>
 
   <div class="overlay" id="overlay"><div class="modal" id="modal"></div></div>
@@ -385,8 +390,9 @@ async function start() {
   $('.eyebrow').textContent = `${song.style} · ${song.meter}/4`;
   $('.practice-strip').hidden = song.source === 'jam';
   $('.songmeta').textContent = song.source === 'jam' ? '첫 4번의 타격을 기다리는 중 · 자유 연주' : `${song.difficulty} · ${BPM} BPM · ${Math.round(DURATION)}초`;
+  $('.kit-footer').classList.toggle('jam-keymap', song.source === 'jam');
   $('.kit-footer>span').innerHTML = song.source === 'jam'
-    ? ['hh', 'snare', 'kick', 'ride'].map(id => `${INSTRUMENTS[id].label} <kbd>${INSTRUMENTS[id].key}</kbd>`).join(' · ')
+    ? fullKeyGuide
     : [...new Set(state.notes.map(note => note.instrument))].map(id => `${INSTRUMENTS[id].label} <kbd>${INSTRUMENTS[id].key}</kbd>`).join(' · ');
   state.status = 'playing';
   state.startAt = song.source === 'jam' ? now : now + COUNT_IN;

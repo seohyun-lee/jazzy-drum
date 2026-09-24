@@ -221,6 +221,13 @@
 .song-option.is-previewing .song-wave i:nth-child(3){animation-delay:340ms}
 @keyframes song-wave{to{transform:scaleY(.45)}}
 @media(prefers-reduced-motion:reduce){.song-option.is-previewing .song-wave i{animation:none}}
+.kit-footer.jam-keymap>span{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:3px 9px;max-width:calc(100% - 115px)}
+.kit-footer.jam-keymap>span>span{white-space:nowrap}
+.fullscreen-keymap{display:none}
+:fullscreen .fullscreen-keymap{position:fixed;right:8px;bottom:7px;z-index:8;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:2px 8px;width:min(52vw,490px);padding:5px 7px;border-radius:8px;background:#173329cf;color:#f5f0df;font-size:9px;line-height:1.45;pointer-events:none}
+:fullscreen .fullscreen-keymap span{white-space:nowrap}
+:fullscreen .fullscreen-keymap kbd{font-size:9px;padding:0 3px}
+@media(max-height:430px) and (orientation:landscape){:fullscreen .fullscreen-keymap{right:4px;bottom:3px;width:min(61vw,500px);gap:1px 6px;padding:3px 5px;font-size:8px}:fullscreen .fullscreen-keymap kbd{font-size:8px}}
 .card-arrow{align-self:center;color:#829483;font-size:18px;line-height:1;text-align:center}
 .modal.song-library .song-option.selected .card-arrow,.modal.song-library .song-option.is-open .card-arrow{color:#2e6847}
 .modal.song-library .mode-option{border-style:solid}
