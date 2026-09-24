@@ -68,8 +68,8 @@ app.innerHTML = `
 
     <section class="game-card" aria-label="드럼 리듬 게임">
       <div class="songbar">
-        <div><p class="eyebrow">BOSSA NOVA · BEGINNER</p><h1>${song.title}</h1><p class="songmeta">${song.difficulty} <span>·</span> ${BPM} BPM <span>·</span> 약 35초</p></div>
-        <div class="song-actions"><button class="library-button" id="library">곡 선택</button><span id="clock">0:00 / 0:35</span><button class="round-button" id="pause" aria-label="일시정지" disabled>Ⅱ</button></div>
+        <div><p class="eyebrow">${song.style} · ${song.difficulty}</p><h1>${song.title}</h1><p class="songmeta">${song.difficulty} <span>·</span> ${BPM} BPM <span>·</span> ${Math.round(DURATION)}초</p></div>
+        <div class="song-actions"><button class="library-button" id="library">곡 선택</button><span id="clock">0:00 / ${Math.floor(DURATION / 60)}:${String(Math.round(DURATION) % 60).padStart(2, '0')}</span><button class="round-button" id="pause" aria-label="일시정지" disabled>Ⅱ</button></div>
       </div>
 
       <div class="notation-wrap">
@@ -259,7 +259,7 @@ function showReady() {
   stopPreview();
   const library = [...songs, ...importedSongs, jamSong];
   const importOpen = song.source === 'file';
-  const songCards = songs.map((item, index) => `<button class="song-option ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}" style="--cover-color:${item.color}"><span class="song-art" aria-hidden="true">${item.icon}</span><span class="song-description"><small class="song-number">TRACK ${String(index + 1).padStart(2, '0')} · ${item.style}</small><strong>${item.title}</strong><span>${item.bpm} BPM · ${item.meter}/4 · ${Math.round(item.duration || item.bars * item.meter * 60 / item.bpm)}초</span><em>${item.mood}</em></span><span class="card-arrow" aria-hidden="true">↗</span></button>`).join('');
+  const songCards = songs.map((item, index) => `<button class="song-option ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}" style="--cover-color:${item.color}"><span class="song-art" aria-hidden="true">${item.icon}</span><span class="song-description"><small class="song-number">TRACK ${String(index + 1).padStart(2, '0')} · ${item.style}</small><strong>${item.title}</strong><span>${item.difficulty} · ${item.bpm} BPM · ${item.meter}/4 · ${Math.round(item.duration || item.bars * item.meter * 60 / item.bpm)}초</span><em>${item.mood}</em></span><span class="card-arrow" aria-hidden="true">↗</span></button>`).join('');
   const importedCards = importedSongs.map(item => `<button class="imported-track ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}"><span>♫</span><strong>${item.title}</strong><small>${item.bpm} BPM</small></button>`).join('');
   const importCard = `<button class="song-option mode-option import-toggle ${importOpen ? 'selected is-open' : ''}" id="import-toggle" type="button" aria-expanded="${importOpen}" aria-controls="import-body"><span class="song-art import-art" aria-hidden="true">＋</span><span class="song-description"><small class="song-number">MY MUSIC</small><strong>내 음악으로 연주하기</strong><span>파일로 채보 만들기</span></span><span class="card-arrow" aria-hidden="true">⌄</span></button>`;
   const importBody = `<div class="import-body" id="import-body" ${importOpen ? '' : 'hidden'}><p>MP3·WAV·M4A를 기기 안에서 분석해요. 원곡을 들으며 칠 수 있습니다.</p><input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a" aria-label="분석할 음악 파일 선택"><p id="import-status" role="status">파일은 업로드되지 않습니다. 8분·50MB 이하를 권장합니다.</p>${importedCards ? `<div class="imported-list">${importedCards}</div>` : ''}</div>`;

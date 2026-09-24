@@ -16,7 +16,7 @@ const bossa = {
   id: 'evening-bossa',
   title: '퇴근길 보사노바',
   style: '보사노바',
-  difficulty: '입문',
+  difficulty: 'EASY+', level: 2,
   bpm: 84,
   bars: 12,
   meter: 4,
@@ -61,22 +61,22 @@ const blueNoteBars = [
 ];
 
 export const songs = [bossa, {
-  id: 'after-hours', title: '막차 뒤 스윙', style: '재즈 스윙', difficulty: '기본',
+  id: 'after-hours', title: '막차 뒤 스윙', style: '재즈 스윙', difficulty: 'NORMAL', level: 3,
   bpm: 108, bars: 16, meter: 4, mood: '라이드 위에서 통통 튀는 늦은 밤',
   color: '#526b9b', icon: '☾',
   chords: [[50, 57, 60, 64], [43, 53, 59, 63], [48, 55, 59, 64], [45, 55, 61, 65]],
 }, {
-  id: 'blue-waltz', title: '푸른 골목의 왈츠', style: '재즈 왈츠', difficulty: '입문',
+  id: 'blue-waltz', title: '푸른 골목의 왈츠', style: '재즈 왈츠', difficulty: 'EASY', level: 1,
   bpm: 96, bars: 16, meter: 3, mood: '하나, 둘, 셋. 세 박자로 걷는 골목',
   color: '#537e76', icon: '≋',
   chords: [[53, 60, 64, 67], [46, 56, 62, 65], [52, 58, 62, 67], [45, 55, 61, 65]],
 }, {
-  id: 'pocket-funk', title: '주머니 속 그루브', style: '재즈 펑크', difficulty: '도전',
+  id: 'pocket-funk', title: '주머니 속 그루브', style: '재즈 펑크', difficulty: 'HARD', level: 4,
   bpm: 102, bars: 16, meter: 4, mood: '엇박 킥과 단단한 백비트의 대화',
   color: '#a25e49', icon: '◉',
   chords: [[40, 55, 62, 66], [45, 55, 59, 64], [50, 60, 64, 67], [47, 57, 63, 67]],
 }, {
-  id: 'blue-note-walk', title: '새벽의 블루 노트', style: '모던 재즈', difficulty: '변주',
+  id: 'blue-note-walk', title: '새벽의 블루 노트', style: '모던 재즈', difficulty: 'EXPERT', level: 5,
   bpm: 112, bars: 20, meter: 4, mood: '스윙과 엇박, 매 마디 달라지는 재즈 대화',
   color: '#344d70', icon: '♭',
   chords: [
@@ -86,7 +86,7 @@ export const songs = [bossa, {
     [50, 57, 60, 65], [53, 56, 60, 62], [48, 55, 59, 64], [48, 58, 64, 67],
     [53, 60, 64, 69], [53, 56, 60, 62], [52, 59, 62, 67], [43, 53, 59, 62],
   ],
-}].map(item => ({ ...item, parts: { drums: createDrumChart(item) } }));
+}].map(item => ({ ...item, parts: { drums: createDrumChart(item) } })).sort((a, b) => a.level - b.level);
 
 function createDrumChart(song) {
   const events = [];

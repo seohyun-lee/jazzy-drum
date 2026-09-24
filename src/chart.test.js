@@ -4,6 +4,8 @@ import { INSTRUMENTS, freshChart, songs } from './chart.js';
 
 test('five songs have distinct playable timelines and use the visible kit', () => {
   assert.equal(songs.length, 5);
+  assert.deepEqual(songs.map(song => song.level), [1, 2, 3, 4, 5]);
+  assert.deepEqual(songs.map(song => song.difficulty), ['EASY', 'EASY+', 'NORMAL', 'HARD', 'EXPERT']);
   assert.equal(new Set(songs.map(song => song.id)).size, 5);
   assert.equal(new Set(songs.map(song => song.meter)).size, 2);
   const signatures = [];
