@@ -754,7 +754,7 @@ $('#guide').addEventListener('click', () => {
 });
 $('#help').addEventListener('click', () => {
   if (state.status === 'playing') pause();
-  openModal(`<p class="modal-kicker">연주 방법</p><h2>악보를 보고, 드럼을 쳐요.</h2><p>노트가 판정선에 닿을 때 해당 드럼을 터치하세요. 칠 위치는 1초 전에 나타나고, 0.5초 전에 선명해져요.</p><div class="key-list"><span>하이햇 <kbd>D</kbd></span><span>스네어 <kbd>V</kbd></span><span>킥 <kbd>Space</kbd></span><span>라이드 <kbd>K</kbd></span></div><button class="primary" id="close-help">${state.status === 'paused' ? '계속 연주' : state.status === 'ready' ? '연주 시작' : '확인'} <span>→</span></button>`);
+  openModal(`<p class="modal-kicker">연주 방법</p><h2>악보를 보고, 드럼을 쳐요.</h2><p>노트가 판정선에 닿을 때 해당 드럼을 터치하세요. 드럼 위의 표시는 1초 전에 나타나고, 0.5초 전에 선명해져요.</p><div class="key-list"><span>하이햇 <kbd>D</kbd></span><span>스네어 <kbd>V</kbd></span><span>킥 <kbd>Space</kbd></span><span>라이드 <kbd>K</kbd></span></div><button class="primary" id="close-help">${state.status === 'paused' ? '계속 연주' : state.status === 'ready' ? '연주 시작' : '확인'} <span>→</span></button>`);
   $('#close-help').addEventListener('click', state.status === 'paused' ? resume : state.status === 'ready' ? start : closeModal);
 });
 

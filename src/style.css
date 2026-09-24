@@ -343,3 +343,13 @@
   .library-footer .primary{padding:6px 10px;font-size:10px}
   .modal.song-library .library-footer .modal-footnote{margin:2px 0 0;font-size:7px}
 }
+
+@media(max-width:600px){
+  .overlay{padding:8px}
+  .modal.song-library{
+    width:calc(100vw - 16px);
+    height:calc(100dvh - 16px);
+    max-height:calc(100dvh - 16px);
+  }
+}
+button:focus-visible{outline:none}
