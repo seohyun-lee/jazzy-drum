@@ -245,8 +245,12 @@
   .modal.result-modal .result-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
   .modal.result-modal .result-actions .primary,.modal.result-modal .result-actions .text-button{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:36px;margin:0;padding:8px 12px;border-radius:9px;font-size:12px;text-decoration:none}
   .modal.result-modal .result-actions .primary{justify-content:space-between}
-  .modal.result-modal .result-actions .text-button{border:1px solid #c5d1c4;background:#f7f8f1;color:#315841;font-weight:700}
+.modal.result-modal .result-actions .text-button{border:1px solid #c5d1c4;background:#f7f8f1;color:#315841;font-weight:700}
 }
+.practice-strip .scroll-choice{margin-top:0}
+.scroll-choice[hidden]{display:none}
+.score-follow .playhead{background:#bd6547;box-shadow:0 0 0 2px #fff8}
+.score-follow .playhead::before{border-top-color:#bd6547}
 .card-arrow{align-self:center;color:#829483;font-size:18px;line-height:1;text-align:center}
 .modal.song-library .song-option.selected .card-arrow,.modal.song-library .song-option.is-open .card-arrow{color:#2e6847}
 .modal.song-library .mode-option{border-style:solid}

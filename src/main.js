@@ -5,6 +5,7 @@ import { guideTargets } from './guide.js';
 import { retimeTimeline } from './timing.js';
 import { analyzeAudio } from './analysis.js';
 import { followTempo, tempoFromFourTaps } from './jam.js';
+import { fixedPageLayout } from './notation.js';
 import './style.css';
 
 const app = document.querySelector('#app');
@@ -62,6 +63,7 @@ const state = {
   feedbackUntil: 0,
   guide: true,
   lookahead: 6,
+  notationMode: 'scroll',
   raf: 0,
 };
 
@@ -79,7 +81,7 @@ app.innerHTML = `
       </div>
 
       <div class="notation-wrap">
-        <div class="practice-strip"><button id="tempo-settings" class="library-button">연주 BPM · ${BPM}</button><label>악보 속도 <select id="scroll-speed"><option value="8">아주 느리게 · 8초 미리보기</option><option value="6" selected>느리게 · 6초 미리보기</option><option value="4">보통 · 4초 미리보기</option><option value="2">빠르게 · 2초 미리보기</option></select></label></div>
+        <div class="practice-strip"><button id="tempo-settings" class="library-button">연주 BPM · ${BPM}</button><label>악보 방식 <select id="notation-mode-main"><option value="scroll">노트 이동</option><option value="follow">판정선 이동</option></select></label><label class="scroll-choice">악보 속도 <select id="scroll-speed"><option value="6" selected>느리게 · 6초 미리보기</option><option value="4">보통 · 4초 미리보기</option><option value="2">빠르게 · 2초 미리보기</option></select></label></div>
         <div class="notation" id="notation" aria-label="다가오는 드럼 노트"><div class="staff-lines"></div><div class="playhead" aria-label="현재 연주 위치"></div><div id="beat-lines"></div><div id="notes-layer"></div></div>
       </div>
 
@@ -214,8 +216,8 @@ async function startPreview() {
 }
 
 function practiceMarkup(collapsible = false) {
-  const controls = `<div class="tempo-heading"><label for="bpm-number">연주 BPM</label><span><input id="bpm-number" aria-label="연주 BPM 숫자 입력" type="number" min="40" max="180" step="1" value="${BPM}"> BPM</span></div><input id="bpm-range" aria-label="연주 BPM 슬라이더" type="range" min="40" max="180" step="1" value="${BPM}"><div class="tempo-presets"><span id="original-tempo">원곡 ${song.bpm} BPM</span><button data-tempo="0.5">절반 속도</button><button data-tempo="0.75">75% 속도</button><button data-tempo="1">원곡 속도</button></div><label class="scroll-choice">악보 속도 <select id="modal-scroll-speed"><option value="8">아주 느리게 · 8초 미리보기</option><option value="6">느리게 · 6초 미리보기</option><option value="4">보통 · 4초 미리보기</option><option value="2">빠르게 · 2초 미리보기</option></select></label>`;
-  if (collapsible) return `<details class="practice-panel library-practice" aria-label="연주 속도 설정"><summary><span>연주 설정</span><strong id="practice-summary">${BPM} BPM · 악보 ${state.lookahead}초 미리보기</strong></summary><div class="practice-content">${controls}</div></details>`;
+  const controls = `<div class="tempo-heading"><label for="bpm-number">연주 BPM</label><span><input id="bpm-number" aria-label="연주 BPM 숫자 입력" type="number" min="40" max="180" step="1" value="${BPM}"> BPM</span></div><input id="bpm-range" aria-label="연주 BPM 슬라이더" type="range" min="40" max="180" step="1" value="${BPM}"><div class="tempo-presets"><span id="original-tempo">원곡 ${song.bpm} BPM</span><button data-tempo="0.5">절반 속도</button><button data-tempo="0.75">75% 속도</button><button data-tempo="1">원곡 속도</button></div><label class="scroll-choice notation-choice">악보 방식 <select id="modal-notation-mode"><option value="scroll">노트 이동</option><option value="follow">판정선 이동</option></select></label><label class="scroll-choice">악보 속도 <select id="modal-scroll-speed"><option value="6">느리게 · 6초 미리보기</option><option value="4">보통 · 4초 미리보기</option><option value="2">빠르게 · 2초 미리보기</option></select></label>`;
+  if (collapsible) return `<details class="practice-panel library-practice" aria-label="연주 속도 설정"><summary><span>연주 설정</span><strong id="practice-summary">${BPM} BPM · ${state.notationMode === 'follow' ? '판정선 이동' : `악보 ${state.lookahead}초 미리보기`}</strong></summary><div class="practice-content">${controls}</div></details>`;
   return `<section class="practice-panel" aria-label="연주 속도 설정">${controls}</section>`;
 }
 
@@ -223,7 +225,10 @@ function syncPracticeControls() {
   if ($('#bpm-number')) $('#bpm-number').value = BPM;
   if ($('#bpm-range')) $('#bpm-range').value = BPM;
   if ($('#original-tempo')) $('#original-tempo').textContent = `원곡 ${song.bpm} BPM`;
-  if ($('#practice-summary')) $('#practice-summary').textContent = `${BPM} BPM · 악보 ${state.lookahead}초 미리보기`;
+  if ($('#practice-summary')) $('#practice-summary').textContent = `${BPM} BPM · ${state.notationMode === 'follow' ? '판정선 이동' : `악보 ${state.lookahead}초 미리보기`}`;
+  if ($('#modal-notation-mode')) $('#modal-notation-mode').value = state.notationMode;
+  $('#notation-mode-main').value = state.notationMode;
+  document.querySelectorAll('.scroll-choice:not(.notation-choice)').forEach(label => { label.hidden = state.notationMode === 'follow'; });
   if ($('#modal-scroll-speed')) $('#modal-scroll-speed').value = String(state.lookahead);
   $('#scroll-speed').value = String(state.lookahead);
   $('#tempo-settings').textContent = `연주 BPM · ${BPM}`;
@@ -250,10 +255,18 @@ function changePracticeTempo(value) {
   syncPracticeControls();
 }
 
+function changeNotationMode(mode) {
+  if (mode !== 'scroll' && mode !== 'follow') return;
+  state.notationMode = mode;
+  syncPracticeControls();
+  renderNotation(currentTime());
+}
+
 function bindPracticeControls() {
   $('#bpm-range').addEventListener('input', event => changePracticeTempo(event.target.value));
   $('#bpm-number').addEventListener('change', event => changePracticeTempo(event.target.value));
   document.querySelectorAll('[data-tempo]').forEach(button => button.addEventListener('click', () => changePracticeTempo(song.bpm * Number(button.dataset.tempo))));
+  $('#modal-notation-mode').addEventListener('change', event => changeNotationMode(event.target.value));
   $('#modal-scroll-speed').addEventListener('change', event => {
     state.lookahead = Number(event.target.value);
     syncPracticeControls();
@@ -568,6 +581,26 @@ function renderNotation(time) {
     return;
   }
   const width = elements.notation.clientWidth;
+  const movingLine = state.notationMode === 'follow';
+  elements.notation.classList.toggle('score-follow', movingLine);
+  const line = elements.notation.querySelector('.playhead');
+  if (movingLine) {
+    const page = fixedPageLayout(time, BEAT, song.meter, width);
+    line.style.left = `${page.playheadX}px`;
+    const visible = state.notes.filter(note => note.beat >= page.startBeat && note.beat < page.endBeat);
+    elements.notesLayer.innerHTML = visible.map(note => {
+      const instrument = INSTRUMENTS[note.instrument];
+      const faded = note.hit || note.missed || note.time < time - 0.15;
+      return `<span class="note note-${note.instrument}" style="left:${page.xForBeat(note.beat)}px;--note-color:${instrument.color};opacity:${faded ? 0.35 : 1}" title="${instrument.label} · ${instrument.key}">${instrument.key === 'Space' ? 'SP' : instrument.key}</span>`;
+    }).join('');
+    let lines = '';
+    for (let beat = page.startBeat; beat <= page.endBeat; beat++) {
+      lines += `<span class="beat-line ${beat % song.meter === 0 ? 'measure' : ''}" style="left:${page.xForBeat(beat)}px"></span>`;
+    }
+    elements.beatLines.innerHTML = lines;
+    return;
+  }
+  line.style.left = '';
   const playhead = width * 0.105;
   const pxPerSecond = (width - playhead - 20) / state.lookahead;
   const visible = state.notes.filter((note) => !note.missed && !note.hit && note.time >= time - 0.12 && note.time <= time + state.lookahead + 0.2);
@@ -711,6 +744,7 @@ $('#scroll-speed').addEventListener('change', event => {
   state.lookahead = Number(event.target.value);
   if (state.status === 'paused') renderNotation(currentTime());
 });
+$('#notation-mode-main').addEventListener('change', event => changeNotationMode(event.target.value));
 $('#guide').addEventListener('click', () => {
   state.guide = !state.guide;
   elements.guide.classList.toggle('is-on', state.guide);
