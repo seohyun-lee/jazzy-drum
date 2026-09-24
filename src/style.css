@@ -231,6 +231,7 @@
 .card-arrow{align-self:center;color:#829483;font-size:18px;line-height:1;text-align:center}
 .modal.song-library .song-option.selected .card-arrow,.modal.song-library .song-option.is-open .card-arrow{color:#2e6847}
 .modal.song-library .mode-option{border-style:solid}
+.modal.song-library .jam-option{grid-template-columns:60px minmax(0,1fr)}
 .modal.song-library .import-toggle{font:inherit;cursor:pointer}
 .modal.song-library .import-toggle .import-art{background:#537c6d}
 .modal.song-library .import-toggle.is-open .card-arrow{transform:rotate(180deg)}
@@ -263,6 +264,7 @@
   .library-section+.library-section{margin-top:17px}
   .modal.song-library .song-grid,.mode-grid{grid-template-columns:1fr;gap:7px}
   .modal.song-library .song-option{grid-template-columns:47px minmax(0,1fr) 17px;gap:10px;min-height:64px;padding:8px;border-radius:12px}
+  .modal.song-library .jam-option{grid-template-columns:47px minmax(0,1fr)}
   .modal.song-library .song-option.selected,.modal.song-library .song-option.is-open{padding:7px}
   .modal.song-library .song-art{width:47px;height:47px;font-size:25px;border-radius:9px}
   .modal.song-library .song-description strong{font-size:12px}
@@ -285,6 +287,7 @@
   .modal.song-library .song-grid,.mode-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
   .modal.song-library .song-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .modal.song-library .song-option{min-height:61px;grid-template-columns:43px minmax(0,1fr) 14px;gap:8px;padding:6px}
+  .modal.song-library .jam-option{grid-template-columns:43px minmax(0,1fr)}
   .modal.song-library .song-option.selected,.modal.song-library .song-option.is-open{padding:5px}
   .modal.song-library .song-art{width:43px;height:43px;font-size:24px}
   .modal.song-library .song-description strong{font-size:11px}
@@ -305,6 +308,7 @@
   .library-section-title strong{font-size:11px}
   .library-section-title span{font-size:8px}
   .modal.song-library .song-option{min-height:52px;grid-template-columns:37px minmax(0,1fr) 13px;gap:7px;padding:5px}
+  .modal.song-library .jam-option{grid-template-columns:37px minmax(0,1fr)}
   .modal.song-library .song-option.selected,.modal.song-library .song-option.is-open{padding:4px}
   .modal.song-library .song-art{width:37px;height:37px;font-size:21px}
   .modal.song-library .song-description{gap:2px}
