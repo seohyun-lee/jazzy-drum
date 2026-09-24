@@ -30,3 +30,11 @@ test('Blue Note has varied bars and alternating cymbal textures', () => {
   assert.ok(notes.some(note => note.instrument === 'ride'));
   assert.ok(notes.filter(note => note.instrument === 'ride').length < notes.filter(note => note.instrument === 'hh').length);
 });
+
+test('After Hours keeps a readable swing pulse with fewer ride hits', () => {
+  const song = songs.find(item => item.id === 'after-hours');
+  const notes = freshChart(song);
+  assert.equal(notes.filter(note => note.instrument === 'ride').length, song.bars * 4);
+  assert.equal(notes.filter(note => note.instrument === 'snare').length, song.bars * 2);
+  assert.equal(notes.filter(note => note.instrument === 'tom2').length, 2);
+});

@@ -106,11 +106,16 @@ function createDrumChart(song) {
       sketch.t?.forEach(([instrument, offset]) => add(base + offset, instrument, 0.66));
       if (sketch.c) add(base, sketch.c, 0.7);
     } else if (song.id === 'after-hours') {
-      [0, 1, 1 + 2 / 3, 2, 3, 3 + 2 / 3].forEach(offset => add(base + offset, 'ride'));
+      (bar % 2 === 0 ? [0, 1 + 2 / 3, 2, 3 + 2 / 3] : [0, 1, 2, 3])
+        .forEach(offset => add(base + offset, 'ride', 0.72));
       [1, 3].forEach(offset => add(base + offset, 'hhPedal'));
       add(base, 'kick');
-      add(base + (bar % 2 === 0 ? 2 + 2 / 3 : 1), 'snare');
-      if (bar % 4 === 3) { add(base + 3, 'tom1'); add(base + 3 + 2 / 3, 'tom2'); add(base + 3 + 2 / 3, bar % 8 === 3 ? 'crash' : 'crash2'); }
+      if (bar % 4 !== 3) add(base + 2, 'kick', 0.68);
+      [1, 3].forEach(offset => add(base + offset, 'snare'));
+      if (bar % 8 === 7) {
+        add(base + 3 + 2 / 3, 'tom2');
+        add(base + 3 + 2 / 3, bar === 7 ? 'crash' : 'crash2');
+      }
     } else if (song.id === 'blue-waltz') {
       [0, 1, 2].forEach(offset => add(base + offset, 'ride'));
       add(base, 'kick');
