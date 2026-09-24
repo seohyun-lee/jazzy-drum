@@ -69,3 +69,31 @@
 .tempo-presets button{background:#fffdf6;border:1px solid #bbccb2;border-radius:7px;padding:5px 8px;font-size:10px;color:#31563f}
 .scroll-choice{margin-top:11px;justify-content:space-between;font-size:11px}
 @media(max-width:440px){.practice-strip{font-size:10px}.practice-strip select{padding:5px}.practice-panel{padding:10px}.tempo-presets{gap:4px}.tempo-presets button{padding:5px 6px}}
+
+.import-panel{margin:14px 0 18px;padding:15px;border:1px solid #d7dfd0;border-radius:14px;background:#f2f5ed}
+.import-panel>strong{display:block;font-size:14px;color:#244734;margin-bottom:5px}
+.modal .import-panel p{font-size:11px;line-height:1.5;margin:0 0 10px}
+.import-panel input[type=file]{display:block;width:100%;font:inherit;font-size:12px;color:#315542}
+.modal .import-panel #import-status{margin:7px 0 12px;color:#426652}
+
+:fullscreen{background:#19342c;overflow:hidden}
+:fullscreen .shell{display:flex;flex-direction:column;width:100%;height:100dvh;max-width:none;padding:0}
+:fullscreen .topbar{flex:0 0 auto;padding:3px 10px;background:#fffaf0}
+:fullscreen .brand{font-size:19px;gap:6px}
+:fullscreen .brand-mark{width:25px;height:25px;border-radius:7px;font-size:18px}
+:fullscreen .brand small,:fullscreen .top-note{display:none}
+:fullscreen .game-card{display:flex;flex-direction:column;flex:1;min-height:0;border:0;border-radius:0;box-shadow:none}
+:fullscreen .songbar{flex:0 0 auto;min-height:37px;padding:2px 10px}
+:fullscreen .songbar h1{font-size:15px;max-width:40vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+:fullscreen .eyebrow,:fullscreen .songmeta{display:none}
+:fullscreen .notation-wrap{flex:0 0 auto;padding:2px 8px 4px}
+:fullscreen .practice-strip{display:none}
+:fullscreen .notation-title{padding:0 4px 2px;font-size:10px}
+:fullscreen .notation{height:clamp(60px,20dvh,88px);border-radius:10px}
+:fullscreen .play-surface{display:flex;flex-direction:column;flex:1;min-height:0;padding:3px 8px 4px;overflow:hidden}
+:fullscreen .surface-heading{flex:0 0 auto;min-height:17px;padding:0 6px 2px;font-size:11px}
+:fullscreen .kit{flex:1 1 auto;min-height:0;height:100%;width:auto;max-width:100%;aspect-ratio:3/2}
+:fullscreen .kit img{width:100%;height:100%;object-fit:contain}
+:fullscreen .kit-footer,:fullscreen .below{display:none}
+:fullscreen .modal{max-height:calc(100dvh - 16px)}
+@media(max-height:430px) and (orientation:landscape){:fullscreen .topbar{padding:1px 8px}:fullscreen .songbar{min-height:31px}:fullscreen .notation{height:60px}:fullscreen .notation-title{font-size:9px}:fullscreen .surface-heading{min-height:14px;font-size:10px}:fullscreen .icon-button{width:25px;height:25px}:fullscreen .fullscreen-button{padding:3px 8px}}

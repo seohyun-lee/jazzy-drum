@@ -3,12 +3,16 @@ import { DrumAudio } from './audio.js';
 import { instrumentForKey } from './input.js';
 import { guideTargets } from './guide.js';
 import { retimeTimeline } from './timing.js';
+import { analyzeAudio } from './analysis.js';
 import './style.css';
 
 const app = document.querySelector('#app');
 const drumKitImage = `${import.meta.env.BASE_URL}assets/drum-kit-labelled.png`;
 let audio = new DrumAudio();
 let song = songs[0];
+const importedSongs = [];
+let trackSource = null;
+let trackGain = null;
 let BPM, BEAT, COUNT_IN, DURATION;
 function setSong(nextSong) {
   song = nextSong;
@@ -18,7 +22,7 @@ function setTempo(bpm) {
   BPM = Math.max(40, Math.min(180, Math.round(bpm)));
   BEAT = 60 / BPM;
   COUNT_IN = song.meter * BEAT;
-  DURATION = song.bars * song.meter * BEAT;
+  DURATION = song.duration ? song.duration * song.bpm / BPM : song.bars * song.meter * BEAT;
 }
 setSong(song);
 const hitZones = [
@@ -145,10 +149,11 @@ function bindPracticeControls() {
 }
 
 function showReady() {
-  openModal(`<p class="modal-kicker">JAZZY · 오늘의 플레이리스트</p><h2>오늘은 어떤 리듬으로?</h2><p>짧은 재즈 한 곡으로, 일상에 박자를 더해요.</p><div class="song-grid">${songs.map(item => `<button class="song-option ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}" style="--cover-color:${item.color}"><span class="song-art" aria-hidden="true">${item.icon}</span><span class="song-description"><strong>${item.title}</strong><span>${item.style} · ${item.bpm} BPM · ${item.meter}/4</span><small>${item.difficulty} · ${Math.round(item.bars * item.meter * 60 / item.bpm)}초</small></span></button>`).join('')}</div><p class="selected-mood" id="selected-mood">${song.mood}</p><button class="primary" id="start">${song.title} 연주 <span>→</span></button><p class="modal-footnote">직접 만든 짧은 반주와 채보 · 키보드 또는 터치로 연주</p>`);
+  const library = [...songs, ...importedSongs];
+  openModal(`<p class="modal-kicker">JAZZY · 오늘의 플레이리스트</p><h2>오늘은 어떤 리듬으로?</h2><p>짧은 재즈 한 곡으로, 일상에 박자를 더해요.</p><div class="song-grid">${library.map(item => `<button class="song-option ${item.id === song.id ? 'selected' : ''}" data-song="${item.id}" aria-pressed="${item.id === song.id}" style="--cover-color:${item.color}"><span class="song-art" aria-hidden="true">${item.icon}</span><span class="song-description"><strong>${item.title}</strong><span>${item.style} · ${item.bpm} BPM · ${item.meter}/4</span><small>${item.difficulty} · ${Math.round(item.duration || item.bars * item.meter * 60 / item.bpm)}초</small></span></button>`).join('')}</div><section class="import-panel"><strong>내 음악으로 연주하기</strong><p>MP3·WAV·M4A를 선택하면 기기 안에서 BPM과 드럼 타격을 추정해요. 원곡을 들으며 칠 수 있습니다.</p><input id="audio-file" type="file" accept="audio/*,.mp3,.wav,.m4a" aria-label="분석할 음악 파일 선택"><p id="import-status" role="status">파일은 업로드되지 않습니다. 8분·50MB 이하를 권장합니다.</p></section><p class="selected-mood" id="selected-mood">${song.mood}</p><button class="primary" id="start">${song.title} 연주 <span>→</span></button><p class="modal-footnote">${song.source === 'file' ? '자동 생성 채보는 추정 결과이며 원곡과 맞지 않는 타격이 있을 수 있어요.' : '직접 만든 짧은 반주와 채보 · 키보드 또는 터치로 연주'}</p>`);
   elements.modal.classList.add('song-library');
   document.querySelectorAll('[data-song]').forEach(button => button.addEventListener('click', () => {
-    setSong(songs.find(item => item.id === button.dataset.song));
+    setSong(library.find(item => item.id === button.dataset.song));
     document.querySelectorAll('[data-song]').forEach(option => {
       const selected = option.dataset.song === song.id;
       option.classList.toggle('selected', selected);
@@ -166,6 +171,42 @@ function showReady() {
     await audio.unlock();
     audio.play(button.dataset.preview);
   }));
+  $('#audio-file').addEventListener('change', importAudioFile);
+}
+
+async function importAudioFile(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  const status = $('#import-status');
+  if (file.size > 50 * 1024 * 1024) { status.textContent = '50MB 이하의 오디오 파일을 선택해 주세요.'; return; }
+  status.textContent = '음악을 분석하고 있어요…';
+  await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+  let decoder;
+  try {
+    decoder = new AudioContext();
+    const buffer = await decoder.decodeAudioData(await file.arrayBuffer());
+    if (buffer.duration > 480) throw new Error('8분 이하의 오디오 파일을 선택해 주세요.');
+    if (buffer.duration < 4) throw new Error('4초 이상의 오디오 파일을 선택해 주세요.');
+    const result = analyzeAudio(buffer);
+    if (result.notes.length < 4) throw new Error('드럼 타격을 충분히 찾지 못했어요. 다른 음악을 시도해 주세요.');
+    const title = file.name.replace(/\.[^.]+$/, '').replace(/[<>&"']/g, '').slice(0, 48) || '내 음악';
+    const imported = {
+      id: `import-${Date.now()}`, title, style: '내 음악', difficulty: '자동 채보',
+      bpm: result.bpm, bars: Math.ceil(buffer.duration * result.bpm / 60 / 4), meter: 4,
+      duration: buffer.duration, mood: `${result.notes.length}개 타격 추정 · 정확도 ${result.confidence}`,
+      color: '#688578', icon: '♫', source: 'file', audioBuffer: buffer,
+      parts: { drums: result.notes },
+    };
+    importedSongs.push(imported);
+    setSong(imported);
+    state.notes = freshChart(song);
+    showReady();
+    $('#import-status').textContent = `${result.bpm} BPM · ${result.notes.length}개 타격을 찾았어요. 아래에서 BPM을 조절한 뒤 연주해 보세요.`;
+  } catch (error) {
+    status.textContent = error instanceof Error ? error.message : '파일을 분석할 수 없습니다.';
+  } finally {
+    if (decoder) await decoder.close();
+  }
 }
 
 function currentTime() {
@@ -174,7 +215,33 @@ function currentTime() {
   return audio.context.currentTime - state.startAt;
 }
 
+function stopTrack() {
+  if (trackSource) {
+    try { trackSource.stop(); } catch { /* Source has already ended. */ }
+    trackSource.disconnect();
+    trackGain?.disconnect();
+    trackSource = null;
+    trackGain = null;
+  }
+}
+
+function startTrack(elapsed, at) {
+  if (song.source !== 'file' || !song.audioBuffer) return;
+  const offset = Math.max(0, elapsed * BPM / song.bpm);
+  if (offset >= song.audioBuffer.duration) return;
+  const source = audio.context.createBufferSource();
+  const gain = audio.context.createGain();
+  source.buffer = song.audioBuffer;
+  source.playbackRate.value = BPM / song.bpm;
+  gain.gain.value = 0.65;
+  source.connect(gain).connect(audio.context.destination);
+  source.start(at, offset);
+  trackSource = source;
+  trackGain = gain;
+}
+
 async function start() {
+  stopTrack();
   audio.stopAll();
   const now = await audio.unlock();
   state.notes = freshChart(song, BPM);
@@ -184,6 +251,7 @@ async function start() {
   $('.kit-footer>span').innerHTML = [...new Set(state.notes.map(note => note.instrument))].map(id => `${INSTRUMENTS[id].label} <kbd>${INSTRUMENTS[id].key}</kbd>`).join(' · ');
   state.status = 'playing';
   state.startAt = now + COUNT_IN;
+  startTrack(0, state.startAt);
   state.scheduledBeat = -song.meter - 1;
   state.combo = 0;
   state.maxCombo = 0;
@@ -201,6 +269,7 @@ function pause() {
   if (state.status === 'playing') {
     state.pausedAt = audio.context.currentTime;
     state.status = 'paused';
+    stopTrack();
     audio.stopAll();
     state.scheduledBeat = Math.floor((state.pausedAt - state.startAt) / BEAT);
     audio.context.suspend();
@@ -220,6 +289,7 @@ function showPause() {
 async function resume() {
   await audio.context.resume();
   state.startAt += audio.context.currentTime - state.pausedAt;
+  startTrack(audio.context.currentTime - state.startAt, Math.max(audio.context.currentTime, state.startAt));
   state.status = 'playing';
   elements.pause.textContent = 'Ⅱ';
   elements.pause.setAttribute('aria-label', '일시정지');
@@ -262,7 +332,7 @@ function scheduleBacking(time) {
     if (at < audio.context.currentTime - 0.03) continue;
     if (beat < 0) {
       audio.click(at, beat === -1);
-    } else {
+    } else if (song.source !== 'file') {
       const bar = Math.floor(beat / song.meter);
       const step = beat % song.meter;
       const chord = song.chords[bar % song.chords.length];
@@ -332,6 +402,7 @@ function formatTime(value) {
 }
 
 function finish() {
+  stopTrack();
   state.status = 'finished';
   elements.pause.disabled = true;
   elements.targetLayer.innerHTML = '';
@@ -345,6 +416,7 @@ function finish() {
 
 function openLibrary() {
   cancelAnimationFrame(state.raf);
+  stopTrack();
   audio.context?.close();
   audio = new DrumAudio();
   state.status = 'ready';
@@ -380,8 +452,15 @@ fullscreenButton.disabled = !document.documentElement.requestFullscreen;
 fullscreenButton.title = fullscreenButton.disabled ? '이 브라우저는 전체화면을 지원하지 않습니다' : '전체화면 전환';
 fullscreenButton.addEventListener('click', async () => {
   try {
-    if (document.fullscreenElement) await document.exitFullscreen();
-    else await document.documentElement.requestFullscreen();
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      screen.orientation?.unlock?.();
+    } else {
+      await document.documentElement.requestFullscreen();
+      if (matchMedia('(pointer: coarse) and (max-width: 900px)').matches) {
+        try { await screen.orientation?.lock?.('landscape'); } catch { /* Some mobile browsers do not allow orientation lock. */ }
+      }
+    }
   } catch {
     fullscreenButton.title = '이 브라우저에서는 전체화면을 사용할 수 없습니다';
   }
