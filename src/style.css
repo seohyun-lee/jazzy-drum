@@ -167,3 +167,20 @@
   :fullscreen .staff-lines{inset:13px 0}
   :fullscreen .playhead{top:3px;bottom:3px}
 }
+/* A little breathing room around the enlarged fullscreen notes. */
+:fullscreen .notation{height:92px}
+:fullscreen .note{width:27px;height:27px;font-size:12px}
+:fullscreen .note-kick{width:34px;font-size:11px}
+:fullscreen .note-hh,:fullscreen .note-crash,:fullscreen .note-crash2,:fullscreen .note-ride{top:24px}
+:fullscreen .note-snare,:fullscreen .note-tom1,:fullscreen .note-tom2,:fullscreen .note-floor,:fullscreen .note-hhPedal{top:46px}
+:fullscreen .note-kick{top:70px}
+:fullscreen .staff-lines{inset:21px 0}
+@media(max-height:430px) and (orientation:landscape){
+  :fullscreen .notation{height:78px}
+  :fullscreen .note{width:24px;height:24px;font-size:11px}
+  :fullscreen .note-kick{width:30px;font-size:10px}
+  :fullscreen .note-hh,:fullscreen .note-crash,:fullscreen .note-crash2,:fullscreen .note-ride{top:18px}
+  :fullscreen .note-snare,:fullscreen .note-tom1,:fullscreen .note-tom2,:fullscreen .note-floor,:fullscreen .note-hhPedal{top:39px}
+  :fullscreen .note-kick{top:58px}
+  :fullscreen .staff-lines{inset:16px 0}
+}
